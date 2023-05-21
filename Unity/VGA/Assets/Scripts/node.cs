@@ -26,4 +26,12 @@ public class node : MonoBehaviour
 
     public void changeColor(Color color) { this.color = color; }
 
+
+
+    private void OnMouseDrag()
+    {
+        if (editMenu.getMode() != editMenu.Mode.Node)
+        { return; }
+        gameObject.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
+    }
 }
