@@ -30,8 +30,7 @@ public class editMenu : MonoBehaviour
     public static void tryRemoveNode(GameObject n)
     {
 
-        nodes.Remove(n);
-        Debug.Log($"node removed: {n.name}  size:{nodes.Count}");
+        
     }
 
     IEnumerator try2RemoveNode(GameObject g) { 
