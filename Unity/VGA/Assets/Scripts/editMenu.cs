@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
+using System.Linq;
 using UnityEngine;
 
 public class editMenu : MonoBehaviour
@@ -16,28 +16,41 @@ public class editMenu : MonoBehaviour
 
     static Mode currentMode;
     static HashSet<GameObject> nodes = new HashSet<GameObject>();
-    [SerializeField] GameObject selcet;
-    public static void addNode(GameObject n) { 
+    static HashSet<GameObject> selectedNodes = new HashSet<GameObject>();
+    static bool isOverNode = false;
+    public static void addNode(GameObject n) {
+        if (n.transform.GetComponent<node>() == null)
+            return;
         nodes.Add(n);
-        Debug.Log($"node added: {n.name}  size:{nodes.Count}");
     }
     public static void removeNode(GameObject n) { 
-
         nodes.Remove(n);
-        Debug.Log($"node removed: {n.name}  size:{nodes.Count}");
+    }
+    public static void removeAllNodes() {
+        for (int i = 0; i < nodes.Count; i++) {
+            nodes.ElementAt(i).GetComponent<node>().setSelected(false);
+        }
+        nodes.Clear();
     }
 
-    public static void tryRemoveNode(GameObject n)
+    public static void addSelectedNode(GameObject g) {
+        if (g.transform.GetComponent<node>() == null)
+            return;
+        selectedNodes.Add(g);
+    }
+    public static void removeSelectedNode(GameObject n)
     {
-
-        
+        selectedNodes.Remove(n);
+    }
+    public static void removeAllSelectedNodes()
+    {
+        for (int i = 0; i < selectedNodes.Count; i++)
+        {
+            selectedNodes.ElementAt(i).GetComponent<node>().setSelected(false);
+        }
+        selectedNodes.Clear();
     }
 
-    IEnumerator try2RemoveNode(GameObject g) { 
-        yield return new WaitForEndOfFrame();
-        if (selcet.active)
-            removeNode(g);
-    }
     public static Mode getMode() {
         return currentMode;
     }
@@ -51,27 +64,39 @@ public class editMenu : MonoBehaviour
         currentMode = Mode.Select;
     }
 
+    public static void setIsOverNode(bool state) { isOverNode = state;}
+    
+    public static void changePosSelectedNodes(GameObject g) {
+        select.getObj().SetActive(false);
+        if (selectedNodes.Count == 0)
+            g.GetComponent<node>().setPos(Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10));
+        else{
+            Vector3 difrence = Camera.main.ScreenToWorldPoint(Input.mousePosition) - g.transform.position + new Vector3(0, 0, 10);
+            foreach (GameObject gm in selectedNodes) { 
+                gm.transform.position += difrence;
+            
+            }
+        }
+    }
 
 
-
-    Vector3 initPos = Vector3.zero;
     private void Update()
     {
         if (Input.GetMouseButton(0))
         {
+            if (!isOverNode && !selectSprite.active) // deselect all nodes !!!!!!!!!!!!! need to check if hovered at node or not
+            {
+                removeAllSelectedNodes();
+            }
             if (currentMode == Mode.Select)
             {
                 selectSprite.SetActive(true);
-                if (initPos == Vector3.zero)
-                    initPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                selectSprite.transform.position = (Camera.main.ScreenToWorldPoint(Input.mousePosition)+ initPos) /2 + new Vector3(0, 0, 10);
-                selectSprite.transform.localScale = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - initPos);
             }
 
         }
         else {
             selectSprite.SetActive(false);
-            initPos = Vector3.zero;
+
         }
     }
 
