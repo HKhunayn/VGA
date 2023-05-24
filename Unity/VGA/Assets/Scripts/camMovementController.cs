@@ -11,6 +11,7 @@ public class camMovementController : MonoBehaviour
     [SerializeField]float minZoom = 10;
     [SerializeField] float maxZoom = 30;
     [SerializeField] float touchZoomMultiplayer = 100f;
+    [SerializeField] float touchMovmentMultiplayer = 5f;
     private Vector3 lastPos;
     Vector2[] lastKnownPos;
     [SerializeField] GameObject ggg;
@@ -21,6 +22,7 @@ public class camMovementController : MonoBehaviour
         lastKnownPos = new Vector2[2]; // save the touch 0 and touch 1
         changeZoom((minZoom + maxZoom / 2f));
         lastPos = getMouseWorldPos();
+        touchMovmentMultiplayer = touchMovmentMultiplayer/Mathf.Min(Screen.currentResolution.width, Screen.currentResolution.height);
     }
 
     private void LateUpdate()
@@ -61,7 +63,7 @@ public class camMovementController : MonoBehaviour
         if (Input.touchCount == 0) // for mouse
             cam.transform.position += (lastPos - getMouseWorldPos());
         else // for toutch
-            cam.transform.position -= new Vector3(Input.GetTouch(0).deltaPosition.x, Input.GetTouch(0).deltaPosition.y, 0)/100f;
+            cam.transform.position -= new Vector3(Input.GetTouch(0).deltaPosition.x, Input.GetTouch(0).deltaPosition.y, 0)* touchMovmentMultiplayer;
         v = cam.transform.position;
         cam.transform.position = new Vector3(Mathf.Clamp(v.x, -XLimit, XLimit), Mathf.Clamp(v.y, -YLimit, YLimit), v.z);
     }

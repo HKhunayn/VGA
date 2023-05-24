@@ -927,6 +927,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba257c8134578194998628d39dc26cef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisabling: 0
 --- !u!50 &320024643
 Rigidbody2D:
   serializedVersion: 4
@@ -1066,6 +1067,7 @@ MonoBehaviour:
   minZoom: 10
   maxZoom: 30
   touchZoomMultiplayer: 100
+  touchMovmentMultiplayer: 5
   ggg: {fileID: 748922248}
 --- !u!20 &519420031
 Camera:
