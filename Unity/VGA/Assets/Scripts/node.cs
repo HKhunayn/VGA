@@ -43,7 +43,13 @@ public class node : MonoBehaviour
         selectedObject.SetActive(state);
         text.color = state ? selectTextColor : defualtTextColor;
     }
-
+    private void OnMouseOver()
+    {
+        if (Input.GetMouseButton(0))
+            setSelected(true);
+        else if (!editMenu.getSelectedNodes().Contains(gameObject))
+            setSelected(false);
+    }
     private void OnMouseDrag()
     {
         if (editMenu.getMode() == editMenu.Mode.Node)
@@ -63,8 +69,19 @@ public class node : MonoBehaviour
 
     private void OnMouseDown()
     {
-        Debug.Log("clicked" + Input.touchCount);
-        if (Input.touchCount == 1)
-            editMenu.addSelectedNode(gameObject);
+        if (Input.touchCount == 1) {
+            if (!editMenu.getSelectedNodes().Contains(gameObject))
+                editMenu.addSelectedNode(gameObject);
+            else
+                StartCoroutine(deSelectIfNotHolding());
+        }
+            
     }
+    IEnumerator deSelectIfNotHolding() { 
+        yield return new WaitForSeconds(0.1f);
+        if (Input.touchCount == 0)
+            editMenu.removeSelectedNode(gameObject);
+
+    }
+
 }

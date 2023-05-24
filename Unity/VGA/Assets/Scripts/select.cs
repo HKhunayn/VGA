@@ -5,9 +5,11 @@ using UnityEngine;
 public class select : MonoBehaviour
 {
     static GameObject obj;
+    public bool isDisabling = true;
     void Start()
     {
         obj = GameObject.Find("select");
+        isDisabling = true;
         obj.SetActive(false);
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -20,10 +22,9 @@ public class select : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag != "node" || editMenu.getSelectedNodes().Contains(collision.gameObject))
+        if (collision.gameObject.tag != "node" || isDisabling)
             return;
-        Debug.Log("-_-");
-        editMenu.removeNode(collision.gameObject);
+        editMenu.removeSelectedNode(collision.gameObject);
         collision.gameObject.GetComponent<node>().setSelected(false);
     }
 
@@ -42,6 +43,7 @@ public class select : MonoBehaviour
     private void OnEnable()
     {
         initPos = Vector3.zero;
+        isDisabling = false;
     }
 
     private void OnDisable()
@@ -50,6 +52,16 @@ public class select : MonoBehaviour
     }
     public static GameObject getObj() {
         return obj;    
+    }
+    public void disableIt() {
+        isDisabling = true;
+        transform.localScale = new Vector3(0, 0, 0);
+        StartCoroutine(disableit2());
+    }
+    IEnumerator disableit2() { 
+        yield return new WaitForEndOfFrame();
+        gameObject.SetActive(false);
+    
     }
 }
 

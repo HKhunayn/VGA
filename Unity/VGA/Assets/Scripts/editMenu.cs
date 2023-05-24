@@ -87,7 +87,6 @@ public class editMenu : MonoBehaviour
 
 
     public static HashSet<GameObject> getSelectedNodes() { return selectedNodes; }
-
     private void Update()
     {
         if (Input.GetMouseButton(0))
@@ -102,8 +101,9 @@ public class editMenu : MonoBehaviour
             }
 
         }
-        else {
-            selectSprite.SetActive(false);
+        else if (!selectSprite.GetComponent<select>().isDisabling & Time.time > 0.1f) {
+            //selectSprite.SetActive(false);
+            selectSprite.GetComponent<select>().disableIt();
 
         }
     }
