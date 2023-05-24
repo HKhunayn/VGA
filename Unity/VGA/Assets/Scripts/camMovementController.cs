@@ -11,10 +11,9 @@ public class camMovementController : MonoBehaviour
     [SerializeField]float minZoom = 10;
     [SerializeField] float maxZoom = 30;
     [SerializeField] float touchZoomMultiplayer = 100f;
-    [SerializeField] float touchMovmentMultiplayer = 5f;
     private Vector3 lastPos;
     Vector2[] lastKnownPos;
-    [SerializeField] GameObject ggg;
+    Vector2 lastTouchPos;
 
     private void Start()
     {
@@ -22,7 +21,7 @@ public class camMovementController : MonoBehaviour
         lastKnownPos = new Vector2[2]; // save the touch 0 and touch 1
         changeZoom((minZoom + maxZoom / 2f));
         lastPos = getMouseWorldPos();
-        touchMovmentMultiplayer = touchMovmentMultiplayer/Mathf.Min(Screen.currentResolution.width, Screen.currentResolution.height);
+        lastTouchPos = Vector2.zero;
     }
 
     private void LateUpdate()
@@ -45,8 +44,16 @@ public class camMovementController : MonoBehaviour
 
         if (Input.GetMouseButton(1)) // changing camera location for the mouse
             changeLoc();
-        if (Input.touchCount == 1 && editMenu.getSelectedNodes().Count ==0) 
+        if (Input.touchCount == 1 && editMenu.getSelectedNodes().Count == 0) {
+            Vector3 diff = new Vector3(Mathf.Abs(lastTouchPos.x - Input.GetTouch(0).position.x), Mathf.Abs(lastTouchPos.y - Input.GetTouch(0).position.y),0f);
+            if (diff.x + diff.y > 100f) { // to fix postioning camera to starting point
+                lastPos = getMouseWorldPos();
+            }
+                
             changeLoc();
+            lastTouchPos= Input.GetTouch(0).position;
+        }
+            
         lastPos = getMouseWorldPos();
 
     }
@@ -54,16 +61,13 @@ public class camMovementController : MonoBehaviour
     {
         cam.orthographicSize=Mathf.Clamp(cam.orthographicSize-= delta, minZoom, maxZoom);
     }
-
+    
     private void changeLoc()
     {
 
         Vector3 v = cam.transform.position;
         // move the camera pos to mouse diricetion
-        if (Input.touchCount == 0) // for mouse
-            cam.transform.position += (lastPos - getMouseWorldPos());
-        else // for toutch
-            cam.transform.position -= new Vector3(Input.GetTouch(0).deltaPosition.x, Input.GetTouch(0).deltaPosition.y, 0)* touchMovmentMultiplayer;
+        cam.transform.position += (lastPos - getMouseWorldPos());
         v = cam.transform.position;
         cam.transform.position = new Vector3(Mathf.Clamp(v.x, -XLimit, XLimit), Mathf.Clamp(v.y, -YLimit, YLimit), v.z);
     }
