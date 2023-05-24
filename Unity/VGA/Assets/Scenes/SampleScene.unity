@@ -1061,9 +1061,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a411a507b79cb4c4b9cebc846d4ed5f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  min: 10
-  max: 30
+  XLimit: 256
+  YLimit: 256
+  minZoom: 10
+  maxZoom: 30
   touchZoomMultiplayer: 100
+  ggg: {fileID: 748922248}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -1252,6 +1255,12 @@ MonoBehaviour:
   - {fileID: 1613078060}
   - {fileID: 2059997307}
   - {fileID: 51156634}
+--- !u!1 &748922248 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4558001158082663095, guid: 3cd560268b66bdf45931251688730f84,
+    type: 3}
+  m_PrefabInstance: {fileID: 20023756}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &810229913
 GameObject:
   m_ObjectHideFlags: 0

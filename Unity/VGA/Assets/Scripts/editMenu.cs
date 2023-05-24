@@ -37,6 +37,7 @@ public class editMenu : MonoBehaviour
         if (g.transform.GetComponent<node>() == null)
             return;
         selectedNodes.Add(g);
+        g.GetComponent<node>().setSelected(true);
     }
     public static void removeSelectedNode(GameObject n)
     {
@@ -68,10 +69,15 @@ public class editMenu : MonoBehaviour
     
     public static void changePosSelectedNodes(GameObject g) {
         select.getObj().SetActive(false);
-        if (selectedNodes.Count == 0)
+        if (selectedNodes.Count == 0) // change pos of node if its not selected (hold to change single node)
             g.GetComponent<node>().setPos(Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10));
         else{
-            Vector3 difrence = Camera.main.ScreenToWorldPoint(Input.mousePosition) - g.transform.position + new Vector3(0, 0, 10);
+            Vector3 basePos = g.transform.position;
+            if (!selectedNodes.Contains(g))  // click at non selected node
+                return;
+            
+                
+            Vector3 difrence = Camera.main.ScreenToWorldPoint(Input.mousePosition) - basePos + new Vector3(0, 0, 10);
             foreach (GameObject gm in selectedNodes) { 
                 gm.transform.position += difrence;
             
@@ -79,6 +85,8 @@ public class editMenu : MonoBehaviour
         }
     }
 
+
+    public static HashSet<GameObject> getSelectedNodes() { return selectedNodes; }
 
     private void Update()
     {
@@ -88,7 +96,7 @@ public class editMenu : MonoBehaviour
             {
                 removeAllSelectedNodes();
             }
-            if (currentMode == Mode.Select)
+            if (currentMode == Mode.Select && (Input.touchCount ==0 || Input.GetTouch(0).deltaTime > 1f))
             {
                 selectSprite.SetActive(true);
             }

@@ -20,21 +20,22 @@ public class select : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag != "node")
+        if (collision.gameObject.tag != "node" || editMenu.getSelectedNodes().Contains(collision.gameObject))
             return;
-        //editMenu.removeNode(collision.gameObject);
-        //collision.gameObject.GetComponent<node>().setSelected(false);
+        Debug.Log("-_-");
+        editMenu.removeNode(collision.gameObject);
+        collision.gameObject.GetComponent<node>().setSelected(false);
     }
 
 
     Vector3 initPos = Vector3.zero;
     private void Update()
     {
-
-            if (initPos == Vector3.zero)
-                initPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            transform.position = (Camera.main.ScreenToWorldPoint(Input.mousePosition) + initPos) / 2 + new Vector3(0, 0, 10);
-            transform.localScale = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - initPos);
+            
+        if (initPos == Vector3.zero)
+            initPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        transform.position = (Camera.main.ScreenToWorldPoint(Input.mousePosition) + initPos) / 2 + new Vector3(0, 0, 10);
+        transform.localScale = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - initPos);
 
 
     }

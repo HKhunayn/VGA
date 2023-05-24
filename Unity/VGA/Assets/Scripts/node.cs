@@ -60,4 +60,11 @@ public class node : MonoBehaviour
     {
         editMenu.setIsOverNode(false);
     }
+
+    private void OnMouseDown()
+    {
+        Debug.Log("clicked" + Input.touchCount);
+        if (Input.touchCount == 1)
+            editMenu.addSelectedNode(gameObject);
+    }
 }
