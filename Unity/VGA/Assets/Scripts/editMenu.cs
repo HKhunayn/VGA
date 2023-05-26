@@ -173,6 +173,16 @@ public class editMenu : MonoBehaviour
         { // add new node
             StartCoroutine(ISpawnNewNode());
         }
+
+        // shortcut to change mode
+        if (Input.GetKeyDown(KeyCode.S))
+            selectMode();
+        else if (Input.GetKeyDown(KeyCode.N))
+            nodeMode();
+        else if (Input.GetKeyDown(KeyCode.E))
+            edgeMode();
+        else if (Input.GetKeyDown(KeyCode.R))
+            removeMode();
     }
 
 
