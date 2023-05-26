@@ -44,7 +44,7 @@ public class camMovementController : MonoBehaviour
 
         if (Input.GetMouseButton(1)) // changing camera location for the mouse
             changeLoc();
-        if (Input.touchCount == 1 && editMenu.getSelectedNodes().Count == 0) {
+        if (Input.touchCount == 1 && !editMenu.getISOverNode()) {
             Vector3 diff = new Vector3(Mathf.Abs(lastTouchPos.x - Input.GetTouch(0).position.x), Mathf.Abs(lastTouchPos.y - Input.GetTouch(0).position.y),0f);
             if (diff.x + diff.y > 100f) { // to fix postioning camera to starting point
                 lastPos = getMouseWorldPos();

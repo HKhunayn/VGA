@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class editMenu : MonoBehaviour
 {
@@ -18,6 +19,11 @@ public class editMenu : MonoBehaviour
     static HashSet<GameObject> nodes = new HashSet<GameObject>();
     static HashSet<GameObject> selectedNodes = new HashSet<GameObject>();
     static bool isOverNode = false;
+    [SerializeField] ButtonController controller;
+    [SerializeField] GameObject node;
+    [SerializeField] Camera cam;
+    private int latestChar = 65; // = A
+    private int latestID = 0; // = A
     public static void addNode(GameObject n) {
         if (n.transform.GetComponent<node>() == null)
             return;
@@ -57,15 +63,69 @@ public class editMenu : MonoBehaviour
     }
     void Start()
     {
-        currentMode = Mode.Select;
         selectMode();
+        
+    }
+    private void selectRightButton()
+    {
+        controller.setSelected(controller.transform.GetChild((int)currentMode).GetComponent<Image>());
+    }
+    public void selectMode() {
+        currentMode = Mode.Select;
+        selectRightButton();
+    }
+    public void nodeMode()
+    {
+        currentMode = Mode.Node;
+        selectRightButton();
     }
 
-    public static void selectMode() {
-        currentMode = Mode.Select;
+    public void edgeMode()
+    {
+        currentMode = Mode.Edge;
+        selectRightButton();
+    }
+    
+    public void removeMode()
+    {
+        currentMode = Mode.Remove;
+        selectRightButton();
+    }
+
+   IEnumerator ISpawnNewNode() // to support touch adding
+    {
+        if (Input.touchCount == 0)
+            spawnNewNode();
+        else if (Input.touchCount == 1) { // if called by touch then make sure the user want to add new node not want to just moving the camera 
+            for (int i = 0; i < 10; i++) { 
+                yield return new WaitForSeconds(0.02f);
+                if (Input.touchCount == 0) {
+                    spawnNewNode();
+                    break;
+                }
+            }
+        
+        }
+        yield return null;
+
+    }
+    private void spawnNewNode() {
+
+        GameObject g= Instantiate(node, cam.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10f), node.transform.rotation);
+        g.GetComponent<node>().setID(latestID);
+        g.GetComponent<node>().setName(((char)latestChar)+"");
+        g.name = "Node ID:"+g.GetComponent<node>().getID();
+        latestChar++;
+        latestID++;
+        if (latestChar == 91) // skip 6 ASCII avoid random chars
+            latestChar += 6;
+        if (latestChar == 123) // after finsh lowwer case start again the upper case
+            latestChar = 65;
+        nodes.Add(g);
     }
 
     public static void setIsOverNode(bool state) { isOverNode = state;}
+    public static bool getISOverNode() { return isOverNode; }
     
     public static void changePosSelectedNodes(GameObject g) {
         select.getObj().SetActive(false);
@@ -89,22 +149,29 @@ public class editMenu : MonoBehaviour
     public static HashSet<GameObject> getSelectedNodes() { return selectedNodes; }
     private void Update()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0)  && Input.touchCount == 0) // when left click
         {
-            if (!isOverNode && !selectSprite.active) // deselect all nodes !!!!!!!!!!!!! need to check if hovered at node or not
+            if (!isOverNode && !selectSprite.active && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) // deselect all nodes !!!!!!!!!!!!! need to check if hovered at node or not
             {
                 removeAllSelectedNodes();
             }
-            if (currentMode == Mode.Select && (Input.touchCount ==0 || Input.GetTouch(0).deltaTime > 1f))
+            if (currentMode == Mode.Select)
             {
                 selectSprite.SetActive(true);
             }
+            
 
         }
         else if (!selectSprite.GetComponent<select>().isDisabling & Time.time > 0.1f) {
             //selectSprite.SetActive(false);
             selectSprite.GetComponent<select>().disableIt();
 
+        }
+
+
+        if (currentMode == Mode.Node && Input.GetMouseButtonDown(0) && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+        { // add new node
+            StartCoroutine(ISpawnNewNode());
         }
     }
 

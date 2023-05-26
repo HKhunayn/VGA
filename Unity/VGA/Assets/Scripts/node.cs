@@ -15,7 +15,7 @@ public class node : MonoBehaviour
     List<node> neighbors;
     GameObject selectedObject;
 
-    void Start()
+    void OnEnable()
     {
         neighbors = new List<node>();
         text = transform.GetChild(0).GetChild(0).GetComponent<TMP_Text>();
@@ -25,7 +25,7 @@ public class node : MonoBehaviour
 
     public void setID(int N) {ID = N;}
     public int getID() { return ID;}
-    public void setName(string name) { this.name = name; text.text=name; }
+    public void setName(string name) { this.name=text.text =name;}
     public string getName() { return name;}
     public void setNeighbors(List<node> l) { neighbors = l; }
     public List<node> getNeighbors() { return neighbors; }
@@ -65,11 +65,13 @@ public class node : MonoBehaviour
     private void OnMouseExit()
     {
         editMenu.setIsOverNode(false);
+        if (!editMenu.getSelectedNodes().Contains(gameObject))
+            setSelected(false);
     }
 
     private void OnMouseDown()
     {
-        if (Input.touchCount == 1) {
+        if (Input.touchCount == 1 || Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
             if (!editMenu.getSelectedNodes().Contains(gameObject))
                 editMenu.addSelectedNode(gameObject);
             else
