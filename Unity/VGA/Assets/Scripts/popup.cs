@@ -22,6 +22,7 @@ public class popup : MonoBehaviour
         lastPos = node.position;
         reScale();
         updateText();
+        StartCoroutine(loop());
     }
 
     // Update is called once per frame

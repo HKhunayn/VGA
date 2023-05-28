@@ -8,6 +8,9 @@ using UnityEngine.UI;
 public class editMenu : MonoBehaviour
 {
     [SerializeField] GameObject selectSprite;
+    [SerializeField] static LineRenderer lineSprite;
+    private static GameObject firstNodeOfEdge;
+    private static GameObject secondNodeOfEdge;
     public enum Mode {
         Select,
         Node,
@@ -17,13 +20,17 @@ public class editMenu : MonoBehaviour
 
     static Mode currentMode;
     static HashSet<GameObject> nodes = new HashSet<GameObject>();
+    static HashSet<GameObject> edges = new HashSet<GameObject>();
     static HashSet<GameObject> selectedNodes = new HashSet<GameObject>();
     static bool isOverNode = false;
     [SerializeField] ButtonController controller;
     [SerializeField] GameObject node;
+    [SerializeField] GameObject edge;
     [SerializeField] Camera cam;
+    [SerializeField] GameObject workSpace;
     private int latestChar = 65; // = A
-    private int latestID = 0; // = A
+    private int latestNodeID = 0; // = A
+    private int latestEdgeID = 0; // = A
     public static void addNode(GameObject n) {
         if (n.transform.GetComponent<node>() == null)
             return;
@@ -64,6 +71,7 @@ public class editMenu : MonoBehaviour
     void Start()
     {
         selectMode();
+        lineSprite = GameObject.Find("line").GetComponent<LineRenderer>();
         
     }
     private void selectRightButton()
@@ -109,24 +117,68 @@ public class editMenu : MonoBehaviour
         yield return null;
 
     }
-    private void spawnNewNode() {
 
-        GameObject g= Instantiate(node, cam.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10f), node.transform.rotation);
-        g.GetComponent<node>().setID(latestID);
-        g.GetComponent<node>().setName(((char)latestChar)+"");
-        g.name = "Node ID:"+g.GetComponent<node>().getID();
+    public void spawnNewNode(float x, float y) {
+        GameObject g = Instantiate(node, new Vector3(x, y, 0), node.transform.rotation);
+        g.transform.parent = workSpace.transform.GetChild(0);
+        g.GetComponent<node>().setID(latestNodeID);
+        g.GetComponent<node>().setName(((char)latestChar) + "");
+        g.name = "Node ID:" + g.GetComponent<node>().getID();
         latestChar++;
-        latestID++;
+        latestNodeID++;
         if (latestChar == 91) // skip 6 ASCII avoid random chars
             latestChar += 6;
         if (latestChar == 123) // after finsh lowwer case start again the upper case
             latestChar = 65;
         nodes.Add(g);
     }
+    private void spawnNewNode() {
+        Vector3 v = cam.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10f);
+        spawnNewNode(v.x,v.y);
+    }
 
     public static void setIsOverNode(bool state) { isOverNode = state;}
     public static bool getISOverNode() { return isOverNode; }
-    
+
+    public static void setFirstNodeOfEdge(GameObject g)
+    {
+        lineSprite.SetPosition(0, g.transform.position);
+        firstNodeOfEdge = g;
+    }
+    public static void setSecondTempNodeOfEdge(GameObject g)
+    {
+        secondNodeOfEdge = g;
+        lineSprite.SetPosition(1, g.transform.position);
+    }
+
+    public static void removeSecondTempNodeOfEdge(GameObject g)
+    {
+        if (secondNodeOfEdge == g)
+            secondNodeOfEdge = null;
+    }
+    public void createNewEdge(GameObject secondNode) {
+        if (firstNodeOfEdge == secondNodeOfEdge || firstNodeOfEdge == null || secondNodeOfEdge == null)
+            return;
+        if (isSameEdges(firstNodeOfEdge, secondNodeOfEdge))
+            return;
+        GameObject g = Instantiate(edge, Vector3.zero, node.transform.rotation);
+        g.transform.parent = workSpace.transform.GetChild(1);
+        g.GetComponent<edge>().setNode(firstNodeOfEdge, secondNodeOfEdge);
+        g.GetComponent<edge>().setID(latestEdgeID);
+        g.name = "Edge ID:" + g.GetComponent<edge>().getID();
+        latestEdgeID++;
+        edges.Add(g);
+        //firstNodeOfEdge = secondNode = null;
+    }
+
+    private bool isSameEdges(GameObject g1, GameObject g2) {
+        GameObject[] gg = new GameObject[] {g1,g2}; 
+        foreach (GameObject g in edges) {
+            if (g.GetComponent<edge>().hasSameNodes(gg))
+                return true;
+        }
+        return false;
+    }
     public static void changePosSelectedNodes(GameObject g) {
         select.getObj().SetActive(false);
         if (selectedNodes.Count == 0) // change pos of node if its not selected (hold to change single node)
@@ -149,7 +201,7 @@ public class editMenu : MonoBehaviour
     public static HashSet<GameObject> getSelectedNodes() { return selectedNodes; }
     private void Update()
     {
-        if (Input.GetMouseButton(0)  && Input.touchCount == 0) // when left click
+        if (Input.GetMouseButton(0) && Input.touchCount == 0) // when left click
         {
             if (!isOverNode && !selectSprite.active && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) // deselect all nodes !!!!!!!!!!!!! need to check if hovered at node or not
             {
@@ -159,15 +211,33 @@ public class editMenu : MonoBehaviour
             {
                 selectSprite.SetActive(true);
             }
-            
+
 
         }
-        else if (!selectSprite.GetComponent<select>().isDisabling & Time.time > 0.1f) {
+        else if (!selectSprite.GetComponent<select>().isDisabling & Time.time > 0.1f)
+        {
             //selectSprite.SetActive(false);
             selectSprite.GetComponent<select>().disableIt();
 
         }
 
+        if (currentMode == Mode.Edge && Input.GetMouseButton(0)) // edge mode to draw preview edge
+        {
+            if (!isOverNode && firstNodeOfEdge != null) {
+                lineSprite.SetPosition(1, cam.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10f));
+                //Debug.Log($"f:{firstNodeOfEdge.name}");
+            }
+                
+            lineSprite.gameObject.SetActive(true);
+
+
+        }
+
+        else {
+            lineSprite.gameObject.SetActive(false);
+            firstNodeOfEdge = null;
+            secondNodeOfEdge = null;
+        }
 
         if (currentMode == Mode.Node && Input.GetMouseButtonDown(0) && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
         { // add new node

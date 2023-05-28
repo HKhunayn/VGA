@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.Mathematics;
+﻿using Unity.Mathematics;
 using UnityEngine;
 
 public class camMovementController : MonoBehaviour
@@ -19,7 +17,7 @@ public class camMovementController : MonoBehaviour
     {
         cam= Camera.main;
         lastKnownPos = new Vector2[2]; // save the touch 0 and touch 1
-        changeZoom((minZoom + maxZoom / 2f));
+        cam.orthographicSize = (minZoom + maxZoom) / 2f;
         lastPos = getMouseWorldPos();
         lastTouchPos = Vector2.zero;
     }
@@ -44,7 +42,7 @@ public class camMovementController : MonoBehaviour
 
         if (Input.GetMouseButton(1)) // changing camera location for the mouse
             changeLoc();
-        if (Input.touchCount == 1 && !editMenu.getISOverNode()) {
+        if (Input.touchCount == 1 && !editMenu.getISOverNode() && editMenu.getMode() != editMenu.Mode.Edge) {
             Vector3 diff = new Vector3(Mathf.Abs(lastTouchPos.x - Input.GetTouch(0).position.x), Mathf.Abs(lastTouchPos.y - Input.GetTouch(0).position.y),0f);
             if (diff.x + diff.y > 100f) { // to fix postioning camera to starting point
                 lastPos = getMouseWorldPos();

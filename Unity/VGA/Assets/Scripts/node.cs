@@ -13,14 +13,19 @@ public class node : MonoBehaviour
     [SerializeField] private Color defualtTextColor = new Color(28/255f, 36/255f, 44/255f);
     TMP_Text text;
     List<node> neighbors;
+    List<edge> edges;
     GameObject selectedObject;
+    editMenu editmenu;
+
 
     void OnEnable()
     {
         neighbors = new List<node>();
+        edges = new List<edge>();
         text = transform.GetChild(0).GetChild(0).GetComponent<TMP_Text>();
         selectedObject = transform.GetChild(1).gameObject;
         transform.position += new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f),0);; // to avoid overlapping 
+        editmenu = GameObject.Find("scripts").GetComponent<editMenu>();
     }
 
     public void setID(int N) {ID = N;}
@@ -60,15 +65,27 @@ public class node : MonoBehaviour
     private void OnMouseEnter()
     {
         editMenu.setIsOverNode(true);
+        if (editMenu.getMode() == editMenu.Mode.Edge)
+        {
+            editMenu.setSecondTempNodeOfEdge(gameObject);
+        }
     }
 
     private void OnMouseExit()
     {
         editMenu.setIsOverNode(false);
-        if (!editMenu.getSelectedNodes().Contains(gameObject))
+        if (!editMenu.getSelectedNodes().Contains(gameObject)) // for disable selection mode for the current node
             setSelected(false);
+        if (editMenu.getMode() == editMenu.Mode.Edge)
+        {
+            editMenu.removeSecondTempNodeOfEdge(gameObject);
+        }
     }
 
+    IEnumerator setFalse(bool f) { 
+        yield return new WaitForSeconds(0.2f);
+        f = false;
+    }
     private void OnMouseDown()
     {
         if (Input.touchCount == 1 || Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
@@ -77,8 +94,20 @@ public class node : MonoBehaviour
             else
                 StartCoroutine(deSelectIfNotHolding());
         }
+
+        if (editMenu.getMode() == editMenu.Mode.Edge) { // if the current mode is edge mode 
+            editMenu.setFirstNodeOfEdge(gameObject);
+        }
             
     }
+
+    private void OnMouseUp() {
+        if (editMenu.getMode() == editMenu.Mode.Edge) // when relese at second node to create new edge
+        {
+            editmenu.createNewEdge(gameObject);
+        }
+    }
+
     IEnumerator deSelectIfNotHolding() { 
         yield return new WaitForSeconds(0.1f);
         if (Input.touchCount == 0)
