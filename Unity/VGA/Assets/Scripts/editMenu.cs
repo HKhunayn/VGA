@@ -31,6 +31,7 @@ public class editMenu : MonoBehaviour
     private int latestChar = 65; // = A
     private int latestNodeID = 0; // = A
     private int latestEdgeID = 0; // = A
+    public void Clear() { removeAllNodes(); removeAllEdges(); latestChar = 65;latestEdgeID = latestNodeID = 0; }
     public static void addNode(GameObject n) {
         if (n.transform.GetComponent<node>() == null)
             return;
@@ -41,11 +42,29 @@ public class editMenu : MonoBehaviour
     }
     public static void removeAllNodes() {
         for (int i = 0; i < nodes.Count; i++) {
-            nodes.ElementAt(i).GetComponent<node>().setSelected(false);
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  must remove the edges too
+            Destroy(nodes.ElementAt(i).gameObject);
         }
         nodes.Clear();
     }
 
+    public static void removeAllEdges()
+    {
+        for (int i = 0; i < edges.Count; i++)
+        {
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  must remove the edges too
+            Destroy(edges.ElementAt(i).gameObject);
+        }
+        edges.Clear();
+    }
+    public static HashSet<GameObject> getAllNode() { return nodes; }
+    public static node getNodeID(int id) {
+        foreach (GameObject g in nodes) {
+            if (g.GetComponent<node>().getID() == id)
+                return g.GetComponent<node>();
+        }
+        return null;
+    }
     public static void addSelectedNode(GameObject g) {
         if (g.transform.GetComponent<node>() == null)
             return;
@@ -118,7 +137,7 @@ public class editMenu : MonoBehaviour
 
     }
 
-    public void spawnNewNode(float x, float y) {
+    public int spawnNewNode(float x, float y) {
         GameObject g = Instantiate(node, new Vector3(x, y, 0), node.transform.rotation);
         g.transform.parent = workSpace.transform.GetChild(0);
         g.GetComponent<node>().setID(latestNodeID);
@@ -131,8 +150,11 @@ public class editMenu : MonoBehaviour
         if (latestChar == 123) // after finsh lowwer case start again the upper case
             latestChar = 65;
         nodes.Add(g);
+        return latestNodeID;
     }
-    private void spawnNewNode() {
+
+
+        private void spawnNewNode() {
         Vector3 v = cam.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10f);
         spawnNewNode(v.x,v.y);
     }
@@ -156,7 +178,7 @@ public class editMenu : MonoBehaviour
         if (secondNodeOfEdge == g)
             secondNodeOfEdge = null;
     }
-    public void createNewEdge(GameObject secondNode) {
+    public void createNewEdge() {
         if (firstNodeOfEdge == secondNodeOfEdge || firstNodeOfEdge == null || secondNodeOfEdge == null)
             return;
         if (isSameEdges(firstNodeOfEdge, secondNodeOfEdge))
@@ -168,10 +190,12 @@ public class editMenu : MonoBehaviour
         g.name = "Edge ID:" + g.GetComponent<edge>().getID();
         latestEdgeID++;
         edges.Add(g);
+        firstNodeOfEdge.GetComponent<node>().addEdge(g.GetComponent<edge>());
+        secondNodeOfEdge.GetComponent<node>().addEdge(g.GetComponent<edge>());
         //firstNodeOfEdge = secondNode = null;
     }
 
-    private bool isSameEdges(GameObject g1, GameObject g2) {
+    public bool isSameEdges(GameObject g1, GameObject g2) {
         GameObject[] gg = new GameObject[] {g1,g2}; 
         foreach (GameObject g in edges) {
             if (g.GetComponent<edge>().hasSameNodes(gg))
@@ -201,9 +225,10 @@ public class editMenu : MonoBehaviour
     public static HashSet<GameObject> getSelectedNodes() { return selectedNodes; }
     private void Update()
     {
+        bool isOverGUI = UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
         if (Input.GetMouseButton(0) && Input.touchCount == 0) // when left click
         {
-            if (!isOverNode && !selectSprite.active && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) // deselect all nodes !!!!!!!!!!!!! need to check if hovered at node or not
+            if (!isOverNode && !selectSprite.active && !isOverGUI) // deselect all nodes !!!!!!!!!!!!! need to check if hovered at node or not
             {
                 removeAllSelectedNodes();
             }
@@ -225,21 +250,16 @@ public class editMenu : MonoBehaviour
         {
             if (!isOverNode && firstNodeOfEdge != null) {
                 lineSprite.SetPosition(1, cam.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10f));
-                //Debug.Log($"f:{firstNodeOfEdge.name}");
+                lineSprite.gameObject.SetActive(true);
             }
-                
-            lineSprite.gameObject.SetActive(true);
 
-
-        }
-
-        else {
+        }else {
             lineSprite.gameObject.SetActive(false);
             firstNodeOfEdge = null;
             secondNodeOfEdge = null;
         }
 
-        if (currentMode == Mode.Node && Input.GetMouseButtonDown(0) && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+        if (currentMode == Mode.Node && Input.GetMouseButtonDown(0) && !isOverGUI && !isOverNode)
         { // add new node
             StartCoroutine(ISpawnNewNode());
         }
@@ -253,6 +273,10 @@ public class editMenu : MonoBehaviour
             edgeMode();
         else if (Input.GetKeyDown(KeyCode.R))
             removeMode();
+        if (Input.GetMouseButton(1) && !isOverGUI && !isOverNode) // open the right-click menu  (-Focus, -Random graph, -Clear, -ScreenShot, -)
+        { 
+            // open the menu
+        }
     }
 
 

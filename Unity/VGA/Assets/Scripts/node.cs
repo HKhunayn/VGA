@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.XR;
 
 public class node : MonoBehaviour
 {
@@ -36,13 +37,19 @@ public class node : MonoBehaviour
     public List<node> getNeighbors() { return neighbors; }
     public void addNeighbor(node n) { neighbors.Add(n); }
     public void removeNeighbor(node n) { try { neighbors.Remove(n); } catch { } }
-
-    public void setPos(Vector3 v) { transform.position = v; }
+    public bool hasNeighbor(node n) { return neighbors.Contains(n); }
+    public void addEdge(edge e) { edges.Add(e); }
+    public void removeEdge(edge e) { try { edges.Remove(e); } catch { } }
+    public void setPos(Vector3 v) { transform.position = v; updateEdgesPos(); }
     public Vector3 getPos() { return transform.position; }
 
     public void changeColor(Color color) { this.color = color; }
     public void changeFontColor(Color color) { text.color = color; }
 
+    public void updateEdgesPos() { 
+        foreach (edge e in edges)
+            e.updateLine();
+    }
     public void setSelected(bool state) {
 
         selectedObject.SetActive(state);
@@ -54,12 +61,13 @@ public class node : MonoBehaviour
             setSelected(true);
         else if (!editMenu.getSelectedNodes().Contains(gameObject))
             setSelected(false);
+
+        if (Input.GetMouseButtonDown(1)) // if left click at the node
+            Debug.Log($"neibors:{neighbors.Count}, edges:{edges.Count}");
     }
     private void OnMouseDrag()
     {
-        if (editMenu.getMode() == editMenu.Mode.Node)
-        { gameObject.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10); }
-        else if (editMenu.getMode() == editMenu.Mode.Select)
+        if (editMenu.getMode() == editMenu.Mode.Select || editMenu.getMode() == editMenu.Mode.Node) // if curerent mode is select or node then move all selected nodes
             editMenu.changePosSelectedNodes(gameObject);
     }
     private void OnMouseEnter()
@@ -104,7 +112,7 @@ public class node : MonoBehaviour
     private void OnMouseUp() {
         if (editMenu.getMode() == editMenu.Mode.Edge) // when relese at second node to create new edge
         {
-            editmenu.createNewEdge(gameObject);
+            editmenu.createNewEdge();
         }
     }
 
@@ -114,5 +122,8 @@ public class node : MonoBehaviour
             editMenu.removeSelectedNode(gameObject);
 
     }
-
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        updateEdgesPos();
+    }
 }

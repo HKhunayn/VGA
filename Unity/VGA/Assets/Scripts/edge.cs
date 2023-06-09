@@ -8,12 +8,20 @@ public class edge : MonoBehaviour
     private int ID;
     private LineRenderer line;
     private GameObject []nodes;
+    private Vector3[] prevNodePos;
     void OnEnable()
     {
         line = GetComponent<LineRenderer>();
         line.positionCount = 2;
         line.widthMultiplier = 0.3f;
         nodes = new GameObject[2];
+        prevNodePos = new Vector3[2];
+        updateLine();
+        
+    }
+    private void Start()
+    {
+        updateLine();
     }
     public void setID(int N) { ID = N; }
     public int getID() { return ID; }
@@ -22,22 +30,28 @@ public class edge : MonoBehaviour
     public void setNode(GameObject node1, GameObject node2) {
         nodes[0] = node1;
         nodes[1] = node2;
+        nodes[0].GetComponent<node>().addNeighbor(nodes[1].GetComponent<node>());
+        nodes[1].GetComponent<node>().addNeighbor(nodes[0].GetComponent<node>());
     }
     public GameObject[] getNodes() { return nodes; }
     public bool hasSameNodes(GameObject[] nodes2) {
         return (nodes.Contains(nodes2[0]) && nodes.Contains(nodes2[1]));
     }
-    public void setNode1(GameObject node1) { nodes[0] = node1; }
+    public void setNode1(GameObject node1) { nodes[0] = node1;}
     public void setNode2(GameObject node2) { nodes[1] = node2; }
 
-    private void FixedUpdate()
-    {
-        //Debug.Log("edges:"+ (nodes[0] == null) + ", " + (nodes[1] == null));
+    public void updateLine() {
         if (nodes[0] == null)
+            return;
+        if (prevNodePos[0] == nodes[0].transform.position && prevNodePos[1] == nodes[1].transform.position)
             return;
         if (nodes[0].transform.position != line.GetPosition(0))
             line.SetPosition(0, nodes[0].transform.position);
         if (nodes[1].transform.position != line.GetPosition(1))
             line.SetPosition(1, nodes[1].transform.position);
+        prevNodePos[0] = nodes[0].transform.position;
+        prevNodePos[1] = nodes[1].transform.position;
+
     }
+
 }
