@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class workspace : MonoBehaviour
 {
     [SerializeField] GameObject leftClickMenu;
+    [SerializeField] GameObject nodeOption;
     [SerializeField] Camera cam;
     [SerializeField] Transform canvas;
     editMenu em;
@@ -25,7 +27,7 @@ public class workspace : MonoBehaviour
             StartCoroutine(activeit());
         }
         else if ((Input.GetMouseButton(0) || Input.GetMouseButton(1)) && leftClickMenu.active)// hide the menu when click
-            StartCoroutine(disableit());
+            StartCoroutine(disableLeftClickMenu());
     }
 
     IEnumerator activeit()
@@ -37,7 +39,7 @@ public class workspace : MonoBehaviour
             leftClickMenu.SetActive(true);
         }
     }
-    IEnumerator disableit()
+    IEnumerator disableLeftClickMenu()
     {
         float time = 0.2f;
         if (Input.GetMouseButton(1))
@@ -110,5 +112,32 @@ public class workspace : MonoBehaviour
     public void Screenshot() {
         Debug.Log(DateTime.UtcNow.ToString("yyyy-MM-dd-mm:ss"));
         //ScreenCapture.CaptureScreenshot("");
+    }
+
+
+
+    node lastNode = null;
+
+    public void updateText() {
+        nodeOption.transform.GetChild(1).GetChild(0).GetComponent<TMP_Text>().text = $"Info:\n   Name: {lastNode.getName()}\n   ID: {lastNode.getID()}\n   Edges: {lastNode.getNeighbors().Count}";
+
+    }
+    public void openNodeOption(node n) {
+        lastNode = n;
+        updateText();
+        updateEdgeOption(n);
+        nodeOption.SetActive(true);
+    }
+
+    public void updateEdgeOption(node n) {
+        lastNode = n;
+        updateText();
+        renameNode.setNode(n);
+        nodeOption.transform.position = cam.WorldToScreenPoint(lastNode.transform.position) + (new Vector3(120 * canvas.localScale.x, -80 * canvas.localScale.y, 0));
+    }
+    public void updateEdgeOption()
+    {
+        try { updateEdgeOption(lastNode); } catch { }
+        
     }
 }

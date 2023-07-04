@@ -17,6 +17,7 @@ public class node : MonoBehaviour
     List<edge> edges;
     GameObject selectedObject;
     editMenu editmenu;
+    workspace workspace;
 
 
     void OnEnable()
@@ -27,6 +28,7 @@ public class node : MonoBehaviour
         selectedObject = transform.GetChild(1).gameObject;
         transform.position += new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f),0);; // to avoid overlapping 
         editmenu = GameObject.Find("scripts").GetComponent<editMenu>();
+        workspace = GameObject.Find("scripts").GetComponent<workspace>();
     }
 
     public void setID(int N) {ID = N;}
@@ -62,13 +64,18 @@ public class node : MonoBehaviour
         else if (!editMenu.getSelectedNodes().Contains(gameObject))
             setSelected(false);
 
-        if (Input.GetMouseButtonDown(1)) // if left click at the node
-            Debug.Log($"neibors:{neighbors.Count}, edges:{edges.Count}");
+        if (Input.GetMouseButtonDown(1)) // if right click at the node
+            workspace.openNodeOption(GetComponent<node>());
+        else if (Input.GetMouseButton(1))
+            workspace.updateEdgeOption(GetComponent<node>());
     }
     private void OnMouseDrag()
     {
         if (editMenu.getMode() == editMenu.Mode.Select || editMenu.getMode() == editMenu.Mode.Node) // if curerent mode is select or node then move all selected nodes
+        { 
             editMenu.changePosSelectedNodes(gameObject);
+            workspace.updateText();
+        }
     }
     private void OnMouseEnter()
     {

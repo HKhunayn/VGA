@@ -12,14 +12,16 @@ public class camMovementController : MonoBehaviour
     private Vector3 lastPos;
     Vector2[] lastKnownPos;
     Vector2 lastTouchPos;
-
+    workspace workspace;
     private void Start()
     {
         cam= Camera.main;
+        workspace = GameObject.Find("scripts").GetComponent<workspace>();
         lastKnownPos = new Vector2[2]; // save the touch 0 and touch 1
         cam.orthographicSize = (minZoom + maxZoom) / 2f;
         lastPos = getMouseWorldPos();
         lastTouchPos = Vector2.zero;
+        
     }
 
     private void LateUpdate()
@@ -58,6 +60,7 @@ public class camMovementController : MonoBehaviour
     void changeZoom(float delta)
     {
         cam.orthographicSize=Mathf.Clamp(cam.orthographicSize-= delta, minZoom, maxZoom);
+        workspace.updateEdgeOption();
     }
     
     private void changeLoc()
@@ -68,6 +71,7 @@ public class camMovementController : MonoBehaviour
         cam.transform.position += (lastPos - getMouseWorldPos());
         v = cam.transform.position;
         cam.transform.position = new Vector3(Mathf.Clamp(v.x, -XLimit, XLimit), Mathf.Clamp(v.y, -YLimit, YLimit), v.z);
+        workspace.updateEdgeOption();
     }
 
     private Vector3 getMouseWorldPos() {

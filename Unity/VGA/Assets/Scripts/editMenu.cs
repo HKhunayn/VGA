@@ -79,7 +79,7 @@ public class editMenu : MonoBehaviour
     {
         for (int i = 0; i < selectedNodes.Count; i++)
         {
-            selectedNodes.ElementAt(i).GetComponent<node>().setSelected(false);
+            try { selectedNodes.ElementAt(i).GetComponent<node>().setSelected(false); } catch (Exception e) { }
         }
         selectedNodes.Clear();
     }
@@ -216,7 +216,9 @@ public class editMenu : MonoBehaviour
             Vector3 difrence = Camera.main.ScreenToWorldPoint(Input.mousePosition) - basePos + new Vector3(0, 0, 10);
             foreach (GameObject gm in selectedNodes) { 
                 gm.transform.position += difrence;
-            
+                gm.GetComponent<node>().updateEdgesPos();
+
+
             }
         }
     }
