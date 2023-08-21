@@ -42,6 +42,8 @@ public class node : MonoBehaviour
     public bool hasNeighbor(node n) { return neighbors.Contains(n); }
     public void addEdge(edge e) { edges.Add(e); }
     public void removeEdge(edge e) { try { edges.Remove(e); } catch { } }
+
+    public List<edge> GetEdges() { return edges; }
     public void setPos(Vector3 v) { transform.position = v; updateEdgesPos(); }
     public Vector3 getPos() { return transform.position; }
 
@@ -57,8 +59,13 @@ public class node : MonoBehaviour
         selectedObject.SetActive(state);
         text.color = state ? selectTextColor : defualtTextColor;
     }
+
+    public bool isSelected() { return selectedObject.active; }
     private void OnMouseOver()
     {
+        if (renameNode.isOpened()) // to disable this funcation when rename menu opened
+            return;
+
         if (Input.GetMouseButton(0))
             setSelected(true);
         else if (!editMenu.getSelectedNodes().Contains(gameObject))
@@ -71,10 +78,18 @@ public class node : MonoBehaviour
     }
     private void OnMouseDrag()
     {
+        if (renameNode.isOpened()) // to disable this funcation when rename menu opened
+            return;
+
         if (editMenu.getMode() == editMenu.Mode.Select || editMenu.getMode() == editMenu.Mode.Node) // if curerent mode is select or node then move all selected nodes
         { 
+
             editMenu.changePosSelectedNodes(gameObject);
-            workspace.updateText();
+
+            if (Input.GetMouseButton(1) ||   Input.touchCount>0 && Input.GetTouch(0).deltaPosition.x < 5f) // to appears the node option
+                workspace.openNodeOption(this);
+            else
+                workspace.closeNodeOption();
         }
     }
     private void OnMouseEnter()

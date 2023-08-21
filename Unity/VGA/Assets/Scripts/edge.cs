@@ -17,7 +17,8 @@ public class edge : MonoBehaviour
         nodes = new GameObject[2];
         prevNodePos = new Vector3[2];
         updateLine();
-        
+
+
     }
     private void Start()
     {
@@ -49,9 +50,34 @@ public class edge : MonoBehaviour
             line.SetPosition(0, nodes[0].transform.position);
         if (nodes[1].transform.position != line.GetPosition(1))
             line.SetPosition(1, nodes[1].transform.position);
+
+        GetComponent<EdgeCollider2D>().points = getEdgeColliderPos();
+
         prevNodePos[0] = nodes[0].transform.position;
         prevNodePos[1] = nodes[1].transform.position;
 
     }
 
+    Vector2[] getEdgeColliderPos() 
+    {
+        Vector2[] v2 = new Vector2[2];
+        Vector2 diff = new Vector2(line.GetPosition(0).x - line.GetPosition(1).x, line.GetPosition(0).y - line.GetPosition(1).y);
+        Vector2 center = new Vector2((line.GetPosition(0).x + line.GetPosition(1).x) / 2f, (line.GetPosition(0).y + line.GetPosition(1).y) / 2f);
+        v2[0] = new Vector2( center.x - (diff.x/3f), center.y - (diff.y / 3f));
+        v2[1] = new Vector2(center.x + (diff.x /3f), center.y + (diff.y / 3f));
+        return v2;
+    }
+
+    public void removeSecondNode(node n) {
+        node node = n.gameObject == nodes[0] ? nodes[1].GetComponent<node>() : nodes[0].GetComponent<node>();
+        node.removeEdge(this);
+        node.removeNeighbor(n);
+    }
+
+    private void OnMouseOver()
+    {
+        if (editMenu.getISOverNode() || (!Input.GetMouseButtonDown(1) && Input.touchCount == 0))
+            return;
+        Debug.Log($"clicked at edge {name}");
+    }
 }

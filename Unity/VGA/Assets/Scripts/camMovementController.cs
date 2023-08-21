@@ -26,6 +26,10 @@ public class camMovementController : MonoBehaviour
 
     private void LateUpdate()
     {
+
+        if (renameNode.isOpened()) // to disable this funcation when rename menu opened
+            return;
+
         if (Input.mouseScrollDelta.y != 0) // for mouse zoom
             changeZoom(Input.mouseScrollDelta.y);
 
@@ -41,6 +45,10 @@ public class camMovementController : MonoBehaviour
         }
     }
     void FixedUpdate() {
+
+
+        if (renameNode.isOpened()) // to disable this funcation when rename menu opened
+            return;
 
         if (Input.GetMouseButton(1)) // changing camera location for the mouse
             changeLoc();

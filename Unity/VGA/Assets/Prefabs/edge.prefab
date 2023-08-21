@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4763212856969444268}
   - component: {fileID: 2496526559303747270}
   - component: {fileID: 2525640765725593331}
+  - component: {fileID: 2114325520454890448}
   m_Layer: 0
   m_Name: edge
   m_TagString: Untagged
@@ -141,3 +142,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b34ee8136013d344ab4aefbc3432f87d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!68 &2114325520454890448
+EdgeCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3150843009540351768}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_EdgeRadius: 0.15
+  m_Points:
+  - {x: 0, y: 0}
+  - {x: 0.03, y: 0}

@@ -40,6 +40,10 @@ public class editMenu : MonoBehaviour
     public static void removeNode(GameObject n) { 
         nodes.Remove(n);
     }
+
+    public static void removeEdge(GameObject e) {
+        edges.Remove(e);
+    }
     public static void removeAllNodes() {
         for (int i = 0; i < nodes.Count; i++) {
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  must remove the edges too

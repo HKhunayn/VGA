@@ -10,6 +10,7 @@ public class workspace : MonoBehaviour
     [SerializeField] GameObject nodeOption;
     [SerializeField] Camera cam;
     [SerializeField] Transform canvas;
+    [SerializeField] ParticleSystem deleteEffect;
     editMenu em;
     private void Start()
     {
@@ -17,6 +18,7 @@ public class workspace : MonoBehaviour
         em =GetComponent<editMenu>();
     }
     Vector3 rightClickMousePos;
+    Coroutine activeitC;
     void Update()
     {
         if (Input.GetMouseButtonDown(1))
@@ -24,7 +26,7 @@ public class workspace : MonoBehaviour
         bool isOverGUI = UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
         if (Input.GetMouseButtonUp(1) && !isOverGUI && !editMenu.getISOverNode() && (Input.mousePosition == rightClickMousePos)) // open the right-click menu  (-Focus, -Random graph, -Clear, -ScreenShot, -)
         {
-            StartCoroutine(activeit());
+            activeitC = StartCoroutine(activeit());
         }
         else if ((Input.GetMouseButton(0) || Input.GetMouseButton(1)) && leftClickMenu.active)// hide the menu when click
             StartCoroutine(disableLeftClickMenu());
@@ -41,10 +43,8 @@ public class workspace : MonoBehaviour
     }
     IEnumerator disableLeftClickMenu()
     {
-        float time = 0.2f;
-        if (Input.GetMouseButton(1))
-            time = 0.5f;
-        yield return new WaitForSecondsRealtime(time);
+        StopCoroutine(activeitC);
+        yield return new WaitForSeconds(0.1f);
         leftClickMenu.SetActive(false);
     }
     public void focus() {
@@ -119,6 +119,8 @@ public class workspace : MonoBehaviour
     node lastNode = null;
 
     public void updateText() {
+        if (lastNode == null)
+            return;
         nodeOption.transform.GetChild(1).GetChild(0).GetComponent<TMP_Text>().text = $"Info:\n   Name: {lastNode.getName()}\n   ID: {lastNode.getID()}\n   Edges: {lastNode.getNeighbors().Count}";
 
     }
@@ -127,6 +129,12 @@ public class workspace : MonoBehaviour
         updateText();
         updateEdgeOption(n);
         nodeOption.SetActive(true);
+    }
+
+
+    public void closeNodeOption() 
+    {
+        nodeOption.SetActive(false);
     }
 
     public void updateEdgeOption(node n) {
@@ -139,5 +147,38 @@ public class workspace : MonoBehaviour
     {
         try { updateEdgeOption(lastNode); } catch { }
         
+    }
+
+
+    public void centerTheLastNode() {
+
+        if (lastNode.getNeighbors().Count < 2) // disable when its only has one neigbore (to avoid overlapping) or zero
+        {
+            closeNodeOption();
+            return;
+        }
+            
+
+        Vector3 v = Vector3.zero;
+        foreach(node n in lastNode.getNeighbors())
+            v += n.transform.position;
+        lastNode.setPos(v/ lastNode.getNeighbors().Count);
+        closeNodeOption();
+    }
+
+
+    public void deleteLastNode() {
+
+        editMenu.removeNode(lastNode.gameObject);
+        foreach (edge e in lastNode.GetEdges()) {
+            editMenu.removeEdge(e.gameObject);
+            e.removeSecondNode(lastNode);
+            Destroy(e.gameObject);
+        }
+
+        deleteEffect.transform.position = lastNode.transform.position;
+        deleteEffect.Play();
+        Destroy(lastNode.gameObject);
+        closeNodeOption();
     }
 }
