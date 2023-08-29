@@ -32,12 +32,12 @@ public class aiChat : MonoBehaviour
             string[] ss = s.Split(' ');
             if (ss[0] == "node") {
                 int n = ss.Count() - 1;
-                editmenu.spawnNewNode(float.Parse(ss[n-1]), float.Parse(ss[n]));
+                editmenu.spawnNewNode(float.Parse(ss[2]), float.Parse(ss[3]));
             }
             else if(ss[0]== "edge"){
                 int n = ss.Count()-1;
-                editMenu.setFirstNodeOfEdge(editMenu.getNodeID(int.Parse(ss[n-1])).gameObject);
-                editMenu.setSecondTempNodeOfEdge(editMenu.getNodeID(int.Parse(ss[n])).gameObject);
+                editMenu.setFirstNodeOfEdge(editMenu.getNodeID(int.Parse(ss[1])).gameObject);
+                editMenu.setSecondTempNodeOfEdge(editMenu.getNodeID(int.Parse(ss[2])).gameObject);
                 editmenu.createNewEdge();
             }
 

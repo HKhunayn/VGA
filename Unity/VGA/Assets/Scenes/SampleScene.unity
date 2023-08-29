@@ -4878,7 +4878,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1318730888}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32ff0ec49479e164f932a57afe8eb782, type: 3}
   m_Name: 
@@ -4886,34 +4886,31 @@ MonoBehaviour:
   editmenu: {fileID: 1318730889}
   s: 'START
 
-    node add 0 0 10
+    node 0 0 0
 
-    node add 1 -10 -10
+    node 1 8 4
 
-    node add 2 10 -10
+    node 2 8 -4
+
+    node 3 16 0
 
     node
-    add 3 -10 0
+    4 24 4
 
-    node add 4 10 0
+    edge 0 1
 
-    edge add 0 0 1
+    edge 0 2
 
-    edge add 1 0 2
+    edge 0 3
 
-    edge
-    add 2 1 2
+    edge 1 2
 
-    edge add 3 0 3
-
-    edge add 4 0 4
-
-    edge add 5 3 4
+    edge 1 3
 
     edge
-    add 6 3 1
+    1 4
 
-    edge add 7 4 2
+    edge 3 4
 
     END'
   aiInput: create a graph
