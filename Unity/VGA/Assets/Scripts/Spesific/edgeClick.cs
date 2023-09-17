@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class edgeClick : MonoBehaviour
 {
-    private void OnMouseDown()
+    private void OnMouseOver()
     {
-        Debug.Log("Clicked lolol;olo");
+        if (Input.GetMouseButtonDown(1) || Input.touchCount > 0)
+            Debug.Log("Clicked lolol;olo");
     }
+
 }

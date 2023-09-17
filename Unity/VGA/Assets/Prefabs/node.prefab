@@ -426,6 +426,9 @@ MonoBehaviour:
   color: {r: 0, g: 0, b: 0, a: 0}
   selectTextColor: {r: 0.61960787, g: 0.87058824, b: 0.7490196, a: 1}
   defualtTextColor: {r: 0.10980392, g: 0.14117648, b: 0.17254902, a: 1}
+  defualtNodeColor: {r: 1, g: 1, b: 1, a: 1}
+  startNodeColor: {r: 0.61960787, g: 0.87058824, b: 0.7490196, a: 1}
+  endNodeColor: {r: 0.87058824, g: 0.61960787, b: 0.63529414, a: 1}
 --- !u!58 &4558001157672235202
 CircleCollider2D:
   m_ObjectHideFlags: 0

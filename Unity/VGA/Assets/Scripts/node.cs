@@ -12,6 +12,10 @@ public class node : MonoBehaviour
     [SerializeField]private Color color;
     [SerializeField] private Color selectTextColor = new Color(158/255f, 222/255f, 191/255f);
     [SerializeField] private Color defualtTextColor = new Color(28/255f, 36/255f, 44/255f);
+
+    [SerializeField] private Color defualtNodeColor = Color.white;
+    [SerializeField] private Color startNodeColor = new Color(158 / 255f, 222 / 255f, 191 / 255f);
+    [SerializeField] private Color endNodeColor = new Color(222 / 255f, 158 / 255f, 162 / 255f);
     TMP_Text text;
     List<node> neighbors;
     List<edge> edges;
@@ -60,11 +64,30 @@ public class node : MonoBehaviour
         text.color = state ? selectTextColor : defualtTextColor;
     }
 
-    public bool isSelected() { return selectedObject.active; }
+    public bool isSelected() { return selectedObject.activeInHierarchy; }
+
+    // 1=defualtColor, 2=startPointColor, 3=endPointColor
+    byte colorMode = 1;
+
+    public void setColorMode(byte mode) {  this.colorMode = mode; setNodeColor(mode); }
+
+    /// <summary>
+    /// 1=defualtColor, 2=startPointColor, 3=endPointColor
+    /// </summary>
+    /// <param name="colorCode"></param>
+    public void setNodeColor(byte colorCode) 
+    {
+        text.color = colorCode != 1 ? Color.white: defualtTextColor;
+        GetComponent<SpriteRenderer>().color = colorCode == 2?  startNodeColor : colorCode == 3? endNodeColor : defualtNodeColor;
+        
+    }
+
+
     private void OnMouseOver()
     {
-        if (renameNode.isOpened()) // to disable this funcation when rename menu opened
+        if (renameNode.isOpened() || actionMenu.isSelecting()) // to disable this funcation when rename menu opened
             return;
+            
 
         if (Input.GetMouseButton(0))
             setSelected(true);
@@ -78,7 +101,7 @@ public class node : MonoBehaviour
     }
     private void OnMouseDrag()
     {
-        if (renameNode.isOpened()) // to disable this funcation when rename menu opened
+        if (renameNode.isOpened() || actionMenu.isSelecting()) // to disable this funcation when rename menu opened
             return;
 
         if (editMenu.getMode() == editMenu.Mode.Select || editMenu.getMode() == editMenu.Mode.Node) // if curerent mode is select or node then move all selected nodes
@@ -95,9 +118,20 @@ public class node : MonoBehaviour
     private void OnMouseEnter()
     {
         editMenu.setIsOverNode(true);
+
         if (editMenu.getMode() == editMenu.Mode.Edge)
         {
             editMenu.setSecondTempNodeOfEdge(gameObject);
+        }
+
+        // change the node color when its on setStart/setEnd points mode
+        if (actionMenu.isStartingSelecting())
+        {
+            setNodeColor(2);
+        }
+        else if (actionMenu.isEndingSelecting())
+        {
+            setNodeColor(3);
         }
     }
 
@@ -110,6 +144,9 @@ public class node : MonoBehaviour
         {
             editMenu.removeSecondTempNodeOfEdge(gameObject);
         }
+
+        // must check first
+        setNodeColor(colorMode);
     }
 
     IEnumerator setFalse(bool f) { 
@@ -118,6 +155,19 @@ public class node : MonoBehaviour
     }
     private void OnMouseDown()
     {
+
+        // change the node color when its on setStart/setEnd points mode
+        if (actionMenu.isStartingSelecting())
+        {
+            actionMenu.SetStartingPoint(this);
+            colorMode = 2;
+        }
+        else if (actionMenu.isEndingSelecting())
+        {
+            actionMenu.setEndingPoint(this);
+            colorMode = 3;
+        }
+
         if (Input.touchCount == 1 || Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
             if (!editMenu.getSelectedNodes().Contains(gameObject))
                 editMenu.addSelectedNode(gameObject);
