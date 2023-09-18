@@ -32,6 +32,8 @@ public class actionMenu : MonoBehaviour
     {
         instance = this;
         currentAlgorithm = StartCoroutine(X());
+        int x = 35;
+        Debug.Log(Mathf.Ceil(x));
     }
 
     public static bool isSelecting(){return instance.selectingMode > 0; }
