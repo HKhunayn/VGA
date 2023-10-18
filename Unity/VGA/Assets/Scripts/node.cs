@@ -51,7 +51,7 @@ public class node : MonoBehaviour
     public void setPos(Vector3 v) { transform.position = v; updateEdgesPos(); }
     public Vector3 getPos() { return transform.position; }
 
-    public void changeColor(Color color) { this.color = color; }
+    public void changeColor(Color color) { this.color = color; GetComponent<SpriteRenderer>().color = color; }
     public void changeFontColor(Color color) { text.color = color; }
 
     public void updateEdgesPos() { 
@@ -198,4 +198,6 @@ public class node : MonoBehaviour
     {
         updateEdgesPos();
     }
+
+    public override string ToString() { return $"{name}"; }
 }

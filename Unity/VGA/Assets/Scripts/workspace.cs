@@ -63,7 +63,7 @@ public class workspace : MonoBehaviour
     public void randomGraph() {
         clear();
         focus();
-        int n = UnityEngine.Random.RandomRange(3,7);
+        int n = UnityEngine.Random.RandomRange(4,8);
         List<int> Ids = new List<int>();
         List<Vector3> usedPos = new List<Vector3>();
         for (int i = 0; i < n; i++) // to create nodes

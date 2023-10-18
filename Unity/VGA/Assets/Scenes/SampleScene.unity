@@ -459,6 +459,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1318730894}
+        m_MethodName: startVisualization
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &101221688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -672,7 +683,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &241763066
 RectTransform:
   m_ObjectHideFlags: 0
@@ -717,7 +728,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.87058824, g: 0.87058824, b: 0.87058824, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -731,7 +742,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 241763068}
   m_OnClick:
     m_PersistentCalls:
@@ -1945,7 +1956,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &520609303
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1990,7 +2001,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.87058824, g: 0.87058824, b: 0.87058824, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -2004,7 +2015,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 520609305}
   m_OnClick:
     m_PersistentCalls:
@@ -4907,7 +4918,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1318730888}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32ff0ec49479e164f932a57afe8eb782, type: 3}
   m_Name: 
@@ -4987,7 +4998,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6abdfabc52af4a7439d726ca5a0983d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vistedColor: {r: 0.61960787, g: 0.8705883, b: 0.7490196, a: 1}
+  exploreColor: {r: 0.61960787, g: 0.627451, b: 0.8705883, a: 1}
   isResume: 1
+  startEndPointsButtons:
+  - {fileID: 1019114067}
+  - {fileID: 1280686854}
   triggerObj: {fileID: 0}
   algorithmMenu: {fileID: 1928119875}
   moreOptionMenu: {fileID: 0}
@@ -6464,7 +6480,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.87058824, g: 0.87058824, b: 0.87058824, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -6482,7 +6498,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1665485447}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1318730894}
+        m_MethodName: setAlgrothem
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1665485446}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1665485447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6718,7 +6745,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -66}
+  m_AnchoredPosition: {x: 0, y: -30}
   m_SizeDelta: {x: 90, y: 6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1724071407
@@ -7757,7 +7784,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.87058824, g: 0.87058824, b: 0.87058824, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -7775,7 +7802,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1865388050}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1318730894}
+        m_MethodName: setAlgrothem
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1865388049}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1865388050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8976,7 +9014,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2097200010
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9021,7 +9059,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.87058824, g: 0.87058824, b: 0.87058824, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -9035,7 +9073,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 2097200012}
   m_OnClick:
     m_PersistentCalls:
