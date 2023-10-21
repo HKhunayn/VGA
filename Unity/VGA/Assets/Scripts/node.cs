@@ -16,6 +16,9 @@ public class node : MonoBehaviour
     [SerializeField] private Color defualtNodeColor = Color.white;
     [SerializeField] private Color startNodeColor = new Color(158 / 255f, 222 / 255f, 191 / 255f);
     [SerializeField] private Color endNodeColor = new Color(222 / 255f, 158 / 255f, 162 / 255f);
+
+    [SerializeField] TMP_Text popUpText;
+
     TMP_Text text;
     List<node> neighbors;
     List<edge> edges;
@@ -81,11 +84,17 @@ public class node : MonoBehaviour
         GetComponent<SpriteRenderer>().color = colorCode == 2?  startNodeColor : colorCode == 3? endNodeColor : defualtNodeColor;
         
     }
-
+    public void fixTheColor()
+    {
+        setNodeColor(colorMode);
+    }
 
     private void OnMouseOver()
     {
-        if (renameNode.isOpened() || actionMenu.isSelecting()) // to disable this funcation when rename menu opened
+
+
+
+        if (renameNode.isOpened() || actionMenu.isSelecting() || actionMenu.isVisualized) // to disable this funcation when rename menu opened,isSelecting, or isVisualized
             return;
             
 
@@ -101,7 +110,8 @@ public class node : MonoBehaviour
     }
     private void OnMouseDrag()
     {
-        if (renameNode.isOpened() || actionMenu.isSelecting()) // to disable this funcation when rename menu opened
+
+        if (renameNode.isOpened() || actionMenu.isSelecting() || actionMenu.isVisualized) // to disable this funcation when rename menu opened,isSelecting, or isVisualized
             return;
 
         if (editMenu.getMode() == editMenu.Mode.Select || editMenu.getMode() == editMenu.Mode.Node) // if curerent mode is select or node then move all selected nodes
@@ -117,6 +127,9 @@ public class node : MonoBehaviour
     }
     private void OnMouseEnter()
     {
+        if (actionMenu.isVisualized) // to disable this funcation when isVisualized
+            return;
+
         editMenu.setIsOverNode(true);
 
         if (editMenu.getMode() == editMenu.Mode.Edge)
@@ -137,6 +150,10 @@ public class node : MonoBehaviour
 
     private void OnMouseExit()
     {
+        if (actionMenu.isVisualized) // to disable this funcation when isVisualized
+            return;
+
+
         editMenu.setIsOverNode(false);
         if (!editMenu.getSelectedNodes().Contains(gameObject)) // for disable selection mode for the current node
             setSelected(false);
@@ -155,6 +172,9 @@ public class node : MonoBehaviour
     }
     private void OnMouseDown()
     {
+
+        if (actionMenu.isVisualized) // to disable this funcation when isVisualized
+            return;
 
         // change the node color when its on setStart/setEnd points mode
         if (actionMenu.isStartingSelecting())
@@ -182,6 +202,10 @@ public class node : MonoBehaviour
     }
 
     private void OnMouseUp() {
+
+        if (actionMenu.isVisualized) // to disable this funcation when isVisualized
+            return;
+
         if (editMenu.getMode() == editMenu.Mode.Edge) // when relese at second node to create new edge
         {
             editmenu.createNewEdge();
@@ -197,6 +221,11 @@ public class node : MonoBehaviour
     private void OnCollisionStay2D(Collision2D collision)
     {
         updateEdgesPos();
+    }
+
+    public void updateText(string text) 
+    { 
+        popUpText.text = text;
     }
 
     public override string ToString() { return $"{name}"; }

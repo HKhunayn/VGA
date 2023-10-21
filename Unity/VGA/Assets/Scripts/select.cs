@@ -56,6 +56,8 @@ public class select : MonoBehaviour
     public void disableIt() {
         isDisabling = true;
         transform.localScale = new Vector3(0, 0, 0);
+        if (!gameObject.activeInHierarchy)
+            gameObject.SetActive(true);
         StartCoroutine(disableit2());
     }
     IEnumerator disableit2() { 

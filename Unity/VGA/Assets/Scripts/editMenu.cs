@@ -158,7 +158,7 @@ public class editMenu : MonoBehaviour
     }
 
 
-        private void spawnNewNode() {
+    private void spawnNewNode() {
         Vector3 v = cam.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10f);
         spawnNewNode(v.x,v.y);
     }
@@ -188,7 +188,7 @@ public class editMenu : MonoBehaviour
         if (isSameEdges(firstNodeOfEdge, secondNodeOfEdge))
             return;
         GameObject g = Instantiate(edge, Vector3.zero, node.transform.rotation);
-        g.transform.parent = workSpace.transform.GetChild(1);
+        g.transform.SetParent(workSpace.transform.GetChild(1));
         g.GetComponent<edge>().setNode(firstNodeOfEdge, secondNodeOfEdge);
         g.GetComponent<edge>().setID(latestEdgeID);
         g.name = "Edge ID:" + g.GetComponent<edge>().getID();
@@ -232,6 +232,15 @@ public class editMenu : MonoBehaviour
     private void Update()
     {
         bool isOverGUI = UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+
+        // disable the whole funcation in Visualization
+        if (actionMenu.isVisualized) 
+        {
+            selectSprite.SetActive(false);
+            return;
+        }
+            
+        
         if (Input.GetMouseButton(0) && Input.touchCount == 0) // when left click
         {
             if (!isOverNode && !selectSprite.active && !isOverGUI) // deselect all nodes !!!!!!!!!!!!! need to check if hovered at node or not

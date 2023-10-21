@@ -21,6 +21,11 @@ public class workspace : MonoBehaviour
     Coroutine activeitC;
     void Update()
     {
+        if (actionMenu.isVisualized)
+        {
+            return;
+        }
+
         if (Input.GetMouseButtonDown(1))
             rightClickMousePos = Input.mousePosition;
         bool isOverGUI = UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
