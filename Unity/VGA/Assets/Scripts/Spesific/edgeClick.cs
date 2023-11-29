@@ -7,7 +7,7 @@ public class edgeClick : MonoBehaviour
     private void OnMouseOver()
     {
         if (Input.GetMouseButtonDown(1) || Input.touchCount > 0)
-            Debug.Log("Clicked lolol;olo");
+            Debug.Log("Clicked lolol;olo" + transform.name);
     }
 
 }

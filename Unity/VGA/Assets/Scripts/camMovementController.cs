@@ -68,6 +68,7 @@ public class camMovementController : MonoBehaviour
     void changeZoom(float delta)
     {
         cam.orthographicSize=Mathf.Clamp(cam.orthographicSize-= delta, minZoom, maxZoom);
+        workspace.updateNodeOption();
         workspace.updateEdgeOption();
     }
     
@@ -79,6 +80,7 @@ public class camMovementController : MonoBehaviour
         cam.transform.position += (lastPos - getMouseWorldPos());
         v = cam.transform.position;
         cam.transform.position = new Vector3(Mathf.Clamp(v.x, -XLimit, XLimit), Mathf.Clamp(v.y, -YLimit, YLimit), v.z);
+        workspace.updateNodeOption();
         workspace.updateEdgeOption();
     }
 

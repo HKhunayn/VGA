@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,6 +44,8 @@ public class actionMenu : MonoBehaviour
         instance = this;
         int x = 35;
         Debug.Log(Mathf.Ceil(x));
+        if (PlayerPrefs.HasKey("lastGraph"))
+            print(PlayerPrefs.GetString("lastGraph"));
     }
 
     public static bool isSelecting(){return instance.selectingMode > 0; }
@@ -198,7 +202,7 @@ public class actionMenu : MonoBehaviour
         
         //yield return new WaitForSecondsRealtime(0.11f);
         isResume = true;
-        yield return new WaitForSecondsRealtime(0.21f);
+        yield return new WaitForSecondsRealtime(0.201f);
         delayTime = temp;
         isResume = false;
     }
@@ -403,5 +407,20 @@ public class actionMenu : MonoBehaviour
         Debug.Log($"visted: {s}    ,notVisted: {s2}");*/
         algorithmHistory.Push(new List<node>[] { new List<node>(visitedNodes), new List<node>(notVisitedNodes)});
         temp();
+    }
+
+
+    public void printWholeTheGraph() 
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach (GameObject n in editMenu.getAllNode())
+            sb.Append($"N {n.GetComponent<node>().getID()} {n.GetComponent<node>().getName()} {n.GetComponent<node>().getPos().x} {n.GetComponent<node>().getPos().y}\n");
+            
+        
+        foreach (GameObject e in editMenu.getAllEdge())
+            sb.Append($"E {e.GetComponent<edge>().getNodes()[0].GetComponent<node>().getID()} {e.GetComponent<edge>().getNodes()[1].GetComponent<node>().getID()}\n");
+
+        print(sb.ToString());
+        PlayerPrefs.SetString("lastGraph",sb.ToString());
     }
 }

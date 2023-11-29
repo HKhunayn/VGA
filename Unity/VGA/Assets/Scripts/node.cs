@@ -106,7 +106,7 @@ public class node : MonoBehaviour
         if (Input.GetMouseButtonDown(1)) // if right click at the node
             workspace.openNodeOption(GetComponent<node>());
         else if (Input.GetMouseButton(1))
-            workspace.updateEdgeOption(GetComponent<node>());
+            workspace.updateNodeOption(GetComponent<node>());
     }
     private void OnMouseDrag()
     {
@@ -119,10 +119,14 @@ public class node : MonoBehaviour
 
             editMenu.changePosSelectedNodes(gameObject);
 
-            if (Input.GetMouseButton(1) ||   Input.touchCount>0 && Input.GetTouch(0).deltaPosition.x < 5f) // to appears the node option
+            if (Input.GetMouseButton(1) || Input.touchCount > 0 && Input.GetTouch(0).deltaPosition.x < 5f) // to appears the node option
                 workspace.openNodeOption(this);
-            else
+            else 
+            {
                 workspace.closeNodeOption();
+                workspace.closeEdgeOption();
+            }
+                
         }
     }
     private void OnMouseEnter()

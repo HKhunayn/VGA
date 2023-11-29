@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,8 +31,23 @@ public class editMenu : MonoBehaviour
     [SerializeField] GameObject workSpace;
     private int latestChar = 65; // = A
     private int latestNodeID = 0; // = A
+    private List<int> usedChar = new List<int>();
     private int latestEdgeID = 0; // = A
-    public void Clear() { removeAllNodes(); removeAllEdges(); latestChar = 65;latestEdgeID = latestNodeID = 0; }
+    private static editMenu instance;
+
+    void Start() 
+    { 
+        instance = this;
+        selectMode();
+        lineSprite = GameObject.Find("line").GetComponent<LineRenderer>();
+    }
+    public static void removeFromTheUsedList(int value) 
+    {
+        instance.usedChar.Remove(value);
+    }
+
+
+    public void Clear() { removeAllNodes(); removeAllEdges(); latestChar = 65;latestEdgeID = latestNodeID = 0; usedChar.Clear(); }
     public static void addNode(GameObject n) {
         if (n.transform.GetComponent<node>() == null)
             return;
@@ -62,6 +78,7 @@ public class editMenu : MonoBehaviour
         edges.Clear();
     }
     public static HashSet<GameObject> getAllNode() { return nodes; }
+    public static HashSet<GameObject> getAllEdge() { return edges; }
     public static node getNodeID(int id) {
         foreach (GameObject g in nodes) {
             if (g.GetComponent<node>().getID() == id)
@@ -90,12 +107,6 @@ public class editMenu : MonoBehaviour
 
     public static Mode getMode() {
         return currentMode;
-    }
-    void Start()
-    {
-        selectMode();
-        lineSprite = GameObject.Find("line").GetComponent<LineRenderer>();
-        
     }
     private void selectRightButton()
     {
@@ -141,18 +152,40 @@ public class editMenu : MonoBehaviour
 
     }
 
-    public int spawnNewNode(float x, float y) {
+    public int spawnNewNode(float x, float y, string name=null) {
+        int temp = 65;
+        if (name == null) 
+        {
+            
+        }
+        
+        while (usedChar.Contains(temp))
+        {
+            temp++;
+            if (temp == 91) // skip 6 ASCII avoid random chars
+                temp += 6;
+            if (temp == 123) // after finsh lowwer case start again the upper case
+            {
+                temp = 65;
+                break;
+            }
+                
+        }
+        string theName = name == null ? (char)temp+"" : name;
         GameObject g = Instantiate(node, new Vector3(x, y, 0), node.transform.rotation);
         g.transform.parent = workSpace.transform.GetChild(0);
         g.GetComponent<node>().setID(latestNodeID);
-        g.GetComponent<node>().setName(((char)latestChar) + "");
+        g.GetComponent<node>().setName((theName));
+        usedChar.Add(temp);
         g.name = "Node ID:" + g.GetComponent<node>().getID();
+        
+
+        //
         latestChar++;
         latestNodeID++;
-        if (latestChar == 91) // skip 6 ASCII avoid random chars
-            latestChar += 6;
-        if (latestChar == 123) // after finsh lowwer case start again the upper case
-            latestChar = 65;
+
+        
+
         nodes.Add(g);
         return latestNodeID;
     }
@@ -266,6 +299,8 @@ public class editMenu : MonoBehaviour
             if (!isOverNode && firstNodeOfEdge != null) {
                 lineSprite.SetPosition(1, cam.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10f));
                 lineSprite.gameObject.SetActive(true);
+                GetComponent<workspace>().closeNodeOption();
+                GetComponent<workspace>().closeEdgeOption();
             }
 
         }else {

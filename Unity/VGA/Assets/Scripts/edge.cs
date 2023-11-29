@@ -128,8 +128,9 @@ public class edge : MonoBehaviour
     }
     private void OnMouseOver()
     {
-        if (editMenu.getISOverNode() || (!Input.GetMouseButtonDown(1) && Input.touchCount == 0))
+        if (editMenu.getISOverNode() || (!Input.GetMouseButtonDown(1) && Input.touchCount == 0) || actionMenu.isVisualized)
             return;
         Debug.Log($"clicked at edge {name}");
+        workspace.openEdgeOption(this);
     }
 }
