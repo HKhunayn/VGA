@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,31 +22,33 @@ public class actionMenu : MonoBehaviour
     [SerializeField] GameObject algorithmMenu;
     [SerializeField] GameObject moreOptionMenu;
     [SerializeField] GameObject playPauseGroup;
+    [SerializeField] editMenu editmenu;
     private static actionMenu instance;
     public static bool isVisualized;
 
     List<node> notVisitedNodes= new List<node>();
     List<node> visitedNodes= new List<node>();
     Stack<List<node>[]> algorithmHistory = new Stack<List<node>[]>();
-    Algorithm selectedAlgorithm = Algorithm.BFS;
+    
+    SortedDictionary<float, List<node>> paths = new SortedDictionary<float, List<node>>();
+    Stack<SortedDictionary<float, List<node>>> algorithmHistory2 = new Stack<SortedDictionary<float, List<node>>>();
+
+    Algorithm selectedAlgorithm;
 
     int counter = 0;
     public enum Algorithm
     {
         BFS,
         DFS,
-        GBFFS,
+        GBFS,
         AStar,
-        Dijkastra
+        notSelected
     }
 
     private void Start()
     {
+        selectedAlgorithm = Algorithm.notSelected;
         instance = this;
-        int x = 35;
-        Debug.Log(Mathf.Ceil(x));
-        if (PlayerPrefs.HasKey("lastGraph"))
-            print(PlayerPrefs.GetString("lastGraph"));
     }
 
     public static bool isSelecting(){return instance.selectingMode > 0; }
@@ -96,7 +99,7 @@ public class actionMenu : MonoBehaviour
 
         if (isVisualized) 
         {
-            // notification.show("cant change the algo when the vis is apply");
+            NotificationSystem.ShowNotification("Cant change the algo when the vis is apply");
             return;
         }
         
@@ -115,13 +118,23 @@ public class actionMenu : MonoBehaviour
         if (startingPoint == null || endingPoint == null) 
         {
             closeAllControllButtons();
+            NotificationSystem.ShowNotification("Make sure you have start and end point!");
+            return;
+        }
+        if (isVisualized)
+        {
+            if (isResume)
+                NotificationSystem.ShowNotification("ALready Visualizing!");
             return;
         }
         isResume = true;
-        if (isVisualized)
+
+        if (selectedAlgorithm == Algorithm.notSelected) 
         {
+            NotificationSystem.ShowNotification("No algorithm selected");
             return;
         }
+
         isVisualized = true;
         counter = 0;
         Debug.Log("Start vis");
@@ -134,10 +147,22 @@ public class actionMenu : MonoBehaviour
             case Algorithm.DFS:
                 runDFS();
                 break;
+            case Algorithm.GBFS:
+                runGBFS();
+                break;
+            case Algorithm.AStar:
+                runASTAR();
+                break;
+
             default:
                 NotificationSystem.ShowNotification("No algorithm selected");
                 break;
         }
+    }
+
+    bool isBlind() 
+    {
+        return (selectedAlgorithm == Algorithm.BFS || selectedAlgorithm == Algorithm.DFS);
     }
 
     public void pauseVisualization()
@@ -167,28 +192,36 @@ public class actionMenu : MonoBehaviour
 
     public void stepBack() 
     {
-        Debug.Log("SetpBack "  + visitedNodes.Count);
+        //Debug.Log("SetpBack "  + visitedNodes.Count);
         pauseVisualization();
         // do somelogic here!
-        temp();
+        //temp();
         if (algorithmHistory.Count > 1)
         {
             algorithmHistory.Pop();
             visitedNodes = new List<node>(algorithmHistory.Peek()[0]);
             notVisitedNodes= new List<node>(algorithmHistory.Peek()[1]);
+
+            if (!isBlind()) 
+            
+            {
+                algorithmHistory2.Pop();
+                paths= new SortedDictionary<float, List<node>>(algorithmHistory2.Peek());
+            }
+                
             //updateHistory();
         }
 
         Debug.Log("SetpBack2 " + visitedNodes.Count);
-        temp();
+        //temp();
         // something that update the new graph vis
         updateVis();
     }
     public void stepForward()
     {
-        Debug.Log("SetpForward");
+        //Debug.Log("SetpForward");
         pauseVisualization();
-        if (visitedNodes.Contains(endingPoint) || notVisitedNodes.Count == 0)
+        if (visitedNodes.Contains(endingPoint) || (notVisitedNodes.Count == 0 && isBlind()  ))
             return;
         StartCoroutine(IStepForward());
 
@@ -226,14 +259,14 @@ public class actionMenu : MonoBehaviour
             l[0].ForEach(str => s += string.Join(", ", str));
             string s2 = "";
             l[1].ForEach(str => s2 += string.Join(", ", str));
-            Debug.Log($"visted: {s}    ,notVisted: {s2} ,algorithmHistory.count: {algorithmHistory.Count}\t");
+            //Debug.Log($"visted: {s}    ,notVisted: {s2} ,algorithmHistory.count: {algorithmHistory.Count}\t");
         }
             
     }
     // options like delayBetweenSteps, save, load
     public void showMoreOptionMenu() 
     {
-        moreOptionMenu.SetActive(!algorithmMenu.activeInHierarchy);
+        moreOptionMenu.SetActive(!moreOptionMenu.activeInHierarchy);
     }
     void clearAll() 
     {
@@ -267,7 +300,16 @@ public class actionMenu : MonoBehaviour
             
             n.setSelected(true);
             changeNodesColor(n, vistedColor);
-            n.updateText(++counter + "");
+            if (isBlind())
+                n.updateText(++counter + "");
+            else if (selectedAlgorithm == Algorithm.GBFS) 
+            {
+                string d = getDistance(n,endingPoint).ToString("F0");
+                n.updateText("Heuristic:" + d);
+            }
+                
+            else
+                n.updateText("Cost:" + paths.ElementAt(0).Key.ToString("F0"));
         }
 
         foreach (node n in notVisitedNodes)
@@ -323,6 +365,8 @@ public class actionMenu : MonoBehaviour
             // join the if block whne the Visualization finshed
             if (visitedNodes.Contains(endingPoint) || notVisitedNodes.Count == 0)
             {
+                if (!visitedNodes.Contains(endingPoint))
+                    NotificationSystem.ShowNotification("Cant reach to the endingPoint!");
                 visitedNodes.Last().fixTheColor();
                 Debug.Log("BFS finshed");
                 //updateHistory();
@@ -376,11 +420,203 @@ public class actionMenu : MonoBehaviour
             // join the if block whne the Visualization finshed
             if (visitedNodes.Contains(endingPoint) || notVisitedNodes.Count == 0)
             {
+                if (!visitedNodes.Contains(endingPoint))
+                    NotificationSystem.ShowNotification("Cant reach to the endingPoint!");
                 visitedNodes.Last().fixTheColor();
-                Debug.Log("BFS finshed");
+                Debug.Log("DFS finshed");
                 //updateHistory();
                 pauseVisualization();
                 
+            }
+        }
+
+
+        // make the path
+    }
+
+
+
+
+    private void runGBFS()
+    {
+        paths.Clear();
+        if (paths.Count == 0 && visitedNodes.Count == 0)
+        {
+            paths.Add(getDistance(startingPoint,endingPoint), new List<node>{startingPoint});
+            //updateHistory();
+        }
+
+        currentAlgorithm = StartCoroutine(IRunGBFS());
+    }
+
+    private IEnumerator IRunGBFS()
+    {
+        //updateHistory();
+        while (isVisualized)
+        {
+            string s2 = "";
+            foreach (var l in paths.Values)
+            {
+                foreach (node nnn in l)
+                {
+                    s2 += nnn+"->";
+                }
+                s2 +="\n";
+            }
+
+
+            Debug.Log(s2);
+
+            yield return new WaitUntil(() => isResume);
+            yield return new WaitForSecondsRealtime(delayTime);
+            yield return new WaitUntil(() => isResume);
+            List<node> currentPath = new List<node>(paths.ElementAt(0).Value);
+            currentPath.Last().setSelected(true);
+            changeNodesColor(currentPath.Last(), vistedColor);// change the color of visited node
+            currentPath.Last().updateText("Heuristic:" + paths.ElementAt(0).Key.ToString("F0"));
+            
+            paths.Remove(paths.ElementAt(0).Key);
+            if (visitedNodes.Contains(currentPath.Last()))
+                continue;
+            visitedNodes.Add(currentPath.Last());
+            notVisitedNodes.Remove(currentPath.Last());
+            foreach (node n in currentPath.Last().getNeighbors()) 
+            {
+
+                if (currentPath.Contains(n) || visitedNodes.Contains(n)) // if it in the current path dont add it again ( avoid the loop)
+                    continue;
+
+/*                if (n == endingPoint)
+                {
+                    visitedNodes.Add(n);
+                    break;
+                }*/
+                    
+                float heuristic = getDistance(n,endingPoint); // heuristic
+                float cost = heuristic; // f(n) = h(n)
+                cost += Random.Range(0.00001f,0.1f); // to make the key handel multuple paths with the same last node
+                List<node> nodes = new List<node>(currentPath);
+                nodes.Add(n);
+                Debug.Log($"Cost={cost} , Value:{string.Join("->", nodes)}  Check?={currentPath.Contains(n)}");
+                paths.Add(cost, new List<node>( nodes)); //add Neighbors of the node to last of paths Dic (apply queue approach)
+                changeNodesColor(n, exploreColor); // change the color of explorde node
+                notVisitedNodes.Add(n);
+            }
+
+
+            updateHistory();
+            // join the if block whne the Visualization finshed
+            if (visitedNodes.Contains(endingPoint) || paths.Count == 0)
+            {
+                if (!visitedNodes.Contains(endingPoint))
+                    NotificationSystem.ShowNotification("Cant reach to the endingPoint!");
+
+                visitedNodes.Last().fixTheColor();
+                Debug.Log("GBFS finshed");
+                //updateHistory();
+                pauseVisualization();
+
+            }
+        }
+
+
+        // make the path
+    }
+
+
+
+    private void runASTAR()
+    {
+        paths.Clear();
+        if (paths.Count == 0 && visitedNodes.Count == 0)
+        {
+            paths.Add(getDistance(startingPoint, endingPoint), new List<node> { startingPoint });
+            //updateHistory();
+        }
+
+        currentAlgorithm = StartCoroutine(IRunASTAR());
+    }
+
+    private IEnumerator IRunASTAR()
+    {
+        //updateHistory();
+        while (isVisualized)
+        {
+            string s2 = "";
+            foreach (var l in paths.Values)
+            {
+                foreach (node nnn in l)
+                {
+                    s2 += nnn + "->";
+                }
+                s2 += "\n";
+            }
+
+
+            Debug.Log(s2);
+
+            yield return new WaitUntil(() => isResume);
+            yield return new WaitForSecondsRealtime(delayTime);
+            yield return new WaitUntil(() => isResume);
+            List<node> currentPath = new List<node>(paths.ElementAt(0).Value);
+            currentPath.Last().setSelected(true);
+            changeNodesColor(currentPath.Last(), vistedColor);// change the color of visited node
+
+            float realCost = 0;
+            int i = 0;
+            for (i = 0; i < currentPath.Count - 1; i++) 
+            {
+                realCost += editmenu.GetEdge(currentPath[i].gameObject, currentPath[i + 1].gameObject).getWeight();
+                
+
+            }
+            Debug.Log("realCost reached " + i + " times");
+
+            currentPath.Last().updateText("Cost:" + paths.ElementAt(0).Key.ToString("F0"));
+
+            paths.Remove(paths.ElementAt(0).Key);
+            if (visitedNodes.Contains(currentPath.Last()))
+                continue;
+            visitedNodes.Add(currentPath.Last());
+            notVisitedNodes.Remove(currentPath.Last());
+            foreach (node n in currentPath.Last().getNeighbors())
+            {
+
+                if (currentPath.Contains(n) || visitedNodes.Contains(n)) // if it in the current path dont add it again ( avoid the loop)
+                    continue;
+
+                /*                if (n == endingPoint)
+                                {
+                                    visitedNodes.Add(n);
+                                    break;
+                                }*/
+
+                float heuristic = getDistance(n, endingPoint); // heuristic
+                float cost = heuristic; // f(n) = h(n)
+                cost += realCost;
+
+                cost += Random.Range(0.00001f, 0.1f); // to make the key handel multuple paths with the same last node
+                List<node> nodes = new List<node>(currentPath);
+                nodes.Add(n);
+                Debug.Log($"Cost={cost} , heuristic:{heuristic}  realCost={realCost}");
+                paths.Add(cost, new List<node>(nodes)); //add Neighbors of the node to last of paths Dic (apply queue approach)
+                changeNodesColor(n, exploreColor); // change the color of explorde node
+                notVisitedNodes.Add(n);
+            }
+
+
+            updateHistory();
+            // join the if block whne the Visualization finshed
+            if (visitedNodes.Contains(endingPoint) || paths.Count == 0)
+            {
+                if (!visitedNodes.Contains(endingPoint))
+                    NotificationSystem.ShowNotification("Cant reach to the endingPoint!");
+
+                visitedNodes.Last().fixTheColor();
+                Debug.Log("GBFS finshed");
+                //updateHistory();
+                pauseVisualization();
+
             }
         }
 
@@ -406,21 +642,92 @@ public class actionMenu : MonoBehaviour
         notVisitedNodes.ForEach(str => s2 += string.Join(", ", str));
         Debug.Log($"visted: {s}    ,notVisted: {s2}");*/
         algorithmHistory.Push(new List<node>[] { new List<node>(visitedNodes), new List<node>(notVisitedNodes)});
-        temp();
+        if (!isBlind())
+            algorithmHistory2.Push(new SortedDictionary<float, List<node>>(paths));
+        //temp();
+        //updateEdgeColor();
+
+
+
+    }
+
+/*    void updateEdgeColor() 
+    {
+        if (selectedAlgorithm == Algorithm.GBFS || selectedAlgorithm == Algorithm.AStar)
+
+        {
+            for (int i = 0; i < paths.Values.ElementAt(0).Count - 1; i++)
+            {
+
+                GameObject[] nn = new GameObject[] { paths.Values.ElementAt(0)[i].gameObject, paths.Values.ElementAt(0)[i + 1].gameObject };
+                setNodeColor(nn);
+            }
+        }
+        else 
+        {
+            for (int i = 0; i < visitedNodes.Count - 1; i++)
+            {
+
+                GameObject[] nn = new GameObject[] { visitedNodes[i].gameObject, visitedNodes[i + 1].gameObject };
+                setNodeColor(nn);
+            }
+
+        }
+
+       
+    
     }
 
 
-    public void printWholeTheGraph() 
+    void setNodeColor(GameObject[] twoNodes = null) 
+    {
+        foreach (GameObject g in editMenu.getAllEdge())
+        {
+            if (twoNodes==null)
+                g.GetComponent<edge>().setEdgeColor(1);
+            else if  (g.GetComponent<edge>().hasSameNodes(twoNodes))
+                g.GetComponent<edge>().setEdgeColor(2);
+
+        }
+    }*/
+
+    public void saveGraph() 
     {
         StringBuilder sb = new StringBuilder();
         foreach (GameObject n in editMenu.getAllNode())
             sb.Append($"N {n.GetComponent<node>().getID()} {n.GetComponent<node>().getName()} {n.GetComponent<node>().getPos().x} {n.GetComponent<node>().getPos().y}\n");
-            
-        
+
+
         foreach (GameObject e in editMenu.getAllEdge())
             sb.Append($"E {e.GetComponent<edge>().getNodes()[0].GetComponent<node>().getID()} {e.GetComponent<edge>().getNodes()[1].GetComponent<node>().getID()}\n");
+        WebCall.SaveGraph(sb.ToString());
+    }
 
-        print(sb.ToString());
-        PlayerPrefs.SetString("lastGraph",sb.ToString());
+    public static void getGraph(string commands)
+    {
+        string[] strings = commands.Split('\n');
+        foreach (string s in strings)
+        {
+            string[] ss = s.Split(' ');
+            if (ss[0] == "N")
+            {
+                instance.editmenu.spawnNewNode(float.Parse(ss[3]), float.Parse(ss[4]), ss[2]);
+            }
+            else if (ss[0] == "E")
+            {
+                editMenu.setFirstNodeOfEdge(editMenu.getNodeID(int.Parse(ss[1])).gameObject);
+                editMenu.setSecondTempNodeOfEdge(editMenu.getNodeID(int.Parse(ss[2])).gameObject);
+                instance.editmenu.createNewEdge();
+            }
+
+        }
+
+    }
+
+
+
+    float getDistance(node n, node n2) 
+    {
+        return Mathf.Sqrt(Mathf.Pow(n.transform.position.x - n2.transform.position.x, 2f) + Mathf.Pow(n.transform.position.y - n2.transform.position.y, 2f));
     }
 }

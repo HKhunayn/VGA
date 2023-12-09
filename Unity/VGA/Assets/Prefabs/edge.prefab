@@ -103,7 +103,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: e
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 14148d07be4215b46befbf7e335296d0, type: 2}
   m_sharedMaterial: {fileID: 322666522118258210, guid: 14148d07be4215b46befbf7e335296d0, type: 2}
@@ -376,6 +376,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b34ee8136013d344ab4aefbc3432f87d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defualtEdgeColor: {r: 1, g: 1, b: 1, a: 1}
+  currentPathEdgeColor: {r: 0.38527945, g: 0.39623475, b: 0.735849, a: 1}
+  finalPathEdgeColor: {r: 0.61960787, g: 0.87058824, b: 0.7490196, a: 1}
 --- !u!68 &2114325520454890448
 EdgeCollider2D:
   m_ObjectHideFlags: 0

@@ -240,6 +240,20 @@ public class editMenu : MonoBehaviour
         }
         return false;
     }
+
+
+    public edge GetEdge(GameObject n1, GameObject n2) 
+    {
+        GameObject[] gg = new GameObject[] { n1, n2 };
+        foreach (GameObject g in edges) 
+        {
+            if (g.GetComponent<edge>().hasSameNodes(gg))
+                return g.GetComponent<edge>();
+        }
+        return null;
+    }
+
+
     public static void changePosSelectedNodes(GameObject g) {
         select.getObj().SetActive(false);
         if (selectedNodes.Count == 0) // change pos of node if its not selected (hold to change single node)
@@ -328,7 +342,6 @@ public class editMenu : MonoBehaviour
             // open the menu
         }
     }
-
 
 
 

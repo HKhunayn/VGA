@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class edge : MonoBehaviour
@@ -9,8 +10,12 @@ public class edge : MonoBehaviour
     private LineRenderer line;
     private GameObject[] nodes;
     private Vector3[] prevNodePos;
-    private int weight = 1;
+    private float weight = 1;
     private bool isDirected = true;
+    [SerializeField] private Color defualtEdgeColor = Color.white;
+    [SerializeField] private Color currentPathEdgeColor = new Color(158 / 255f, 160 / 255f, 222 / 255f);
+    [SerializeField] private Color finalPathEdgeColor = new Color(158 / 255f, 222 / 255f, 191 / 255f);
+
     void OnEnable()
     {
         line = GetComponent<LineRenderer>();
@@ -44,8 +49,19 @@ public class edge : MonoBehaviour
     public void setNode1(GameObject node1) { nodes[0] = node1;}
     public void setNode2(GameObject node2) { nodes[1] = node2; updateTargetNodeForTheArraw(); }
 
-    public void getWeight(int w) { weight = w; }
-    public int setWeight() { return weight; }
+
+    /// <summary>
+    /// 1=defualtEdgeColor, 2=currentPathEdgeColor, 3=finalPathEdgeColor
+    /// </summary>
+    /// <param name="colorCode"></param>
+    public void setEdgeColor(byte colorCode)
+    {
+        Color c = colorCode == 2 ? currentPathEdgeColor : colorCode == 3 ? finalPathEdgeColor : defualtEdgeColor;
+        GetComponent<LineRenderer>().SetColors(c,c);
+    }
+
+    public void setWeight(float w) { weight = w; }
+    public float getWeight() { return weight; }
 
     public void hideWeight(bool state) { transform.GetChild(0).gameObject.SetActive(state); }
     public void updateLine() {
@@ -62,9 +78,14 @@ public class edge : MonoBehaviour
 
         prevNodePos[0] = nodes[0].transform.position;
         prevNodePos[1] = nodes[1].transform.position;
-
+        updateWight();
         updateWeigtedLocation();
         updateArrow();
+    }
+    void updateWight() 
+    {
+        weight = Mathf.Sqrt( Mathf.Pow(line.GetPosition(0).x- line.GetPosition(1).x,2f) + Mathf.Pow(line.GetPosition(0).y - line.GetPosition(1).y, 2f));
+        transform.GetChild(0).GetChild(0).GetComponent<TMP_Text>().text = weight.ToString("F0");
     }
 
     void updateWeigtedLocation() 
@@ -133,4 +154,14 @@ public class edge : MonoBehaviour
         Debug.Log($"clicked at edge {name}");
         workspace.openEdgeOption(this);
     }
+/*
+    private void OnMouseDown()
+    {
+        if (editMenu.getMode() == editMenu.Mode.Remove)
+        { // if the current mode is remove mode 
+            workspace.deleteEdge(this);
+
+        }
+    }*/
+
 }

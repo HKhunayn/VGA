@@ -202,7 +202,12 @@ public class node : MonoBehaviour
         if (editMenu.getMode() == editMenu.Mode.Edge) { // if the current mode is edge mode 
             editMenu.setFirstNodeOfEdge(gameObject);
         }
-            
+        else if (editMenu.getMode() == editMenu.Mode.Remove)
+        { // if the current mode is remove mode 
+            workspace.deleteNode(this);
+
+        }
+
     }
 
     private void OnMouseUp() {

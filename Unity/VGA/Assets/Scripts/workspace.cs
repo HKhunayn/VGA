@@ -68,16 +68,11 @@ public class workspace : MonoBehaviour
     }
 
     public void randomGraph() {
-        Debug.Log("1");
         clear();
-        Debug.Log("2");
         focus();
-        Debug.Log("3");
         int n = Random.RandomRange(4,8);
-        Debug.Log("4");
         List<int> Ids = new List<int>();
         List<Vector3> usedPos = new List<Vector3>();
-        Debug.Log("5");
         for (int i = 0; i < n; i++) // to create nodes
         {
             Vector3 pos;
@@ -85,7 +80,6 @@ public class workspace : MonoBehaviour
             Ids.Add(em.spawnNewNode(pos.x, pos.y));
 
         }
-        Debug.Log("6");
         int e = Random.RandomRange(n, n*(n-1)/2);
 
         for (int i = 0; i < n; i++) 
@@ -121,7 +115,6 @@ public class workspace : MonoBehaviour
                 count++;
             }
         }
-        Debug.Log("7");
 /*        for (int i = 0; i < e; i++)
         { // create a random edges for the remaining number of total edges
             GameObject g1 = editMenu.getNodeID(Ids[Random.RandomRange(0, Ids.Count - 1)]).gameObject;
@@ -199,6 +192,12 @@ public class workspace : MonoBehaviour
     }
 
 
+    public static void deleteNode(node n) 
+    {
+        instance.lastNode = n;
+        instance.deleteLastNode();
+    }
+
     public void deleteLastNode() {
 
         editMenu.removeNode(lastNode.gameObject);
@@ -247,6 +246,12 @@ public class workspace : MonoBehaviour
         instance.updateEdgeText();
         instance.updateEdgeOption(e);
         instance.edgeOption.SetActive(true);
+    }
+
+    public static void deleteEdge(edge e) 
+    {
+        instance.lastEdge = e;
+        instance.deleteLastNode();
     }
     public void deleteLastEdge()
     {
